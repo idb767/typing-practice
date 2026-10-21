@@ -1,0 +1,3136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>打字练习 · 中文 / 英文 / 代码</title>
+<style>
+  :root {
+    --bg: #0b0d11;
+    --bg-glow-1: rgba(232, 185, 35, 0.055);
+    --bg-glow-2: rgba(122, 162, 255, 0.05);
+    --elev: #12151c;
+    --elev-2: #1a1e28;
+    --elev-3: #212633;
+    --border: #252b38;
+    --border-soft: #1d222d;
+    --text: #e7ebf3;
+    --muted: #818b9f;
+    --dim: #4e576b;
+    --dim-2: #39404f;
+    --accent: #e8b923;
+    --accent-soft: rgba(232, 185, 35, 0.13);
+    --accent-line: rgba(232, 185, 35, 0.42);
+    --blue: #7aa2ff;
+    --error: #ff646c;
+    --error-soft: rgba(255, 100, 108, 0.14);
+    --ok: #5ad1a0;
+    --punct: #9aa4b8;
+    --radius: 14px;
+    --font-ui: "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+    --font-mono: "Cascadia Code", "JetBrains Mono", "SF Mono", Consolas, "Courier New", monospace;
+    --font-zh: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", "Source Han Sans SC", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1100px 620px at 12% -10%, var(--bg-glow-1), transparent 62%),
+      radial-gradient(900px 520px at 96% 0%, var(--bg-glow-2), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  button, select, input, textarea { font-family: inherit; }
+
+  button { cursor: pointer; }
+
+  .app {
+    width: min(1080px, calc(100vw - 48px));
+    margin: 0 auto;
+    padding: 26px 0 34px;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    color: #17140a;
+    background: linear-gradient(150deg, #f3cd4e, #d9a90f);
+    box-shadow: 0 4px 16px rgba(232, 185, 35, 0.2);
+    font-size: 16px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 3px;
+    padding: 4px;
+    border: 1px solid var(--border-soft);
+    background: rgba(18, 21, 28, 0.8);
+    border-radius: 12px;
+  }
+
+  .tab {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    padding: 8px 21px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-weight: 600;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: #17140a; background: var(--accent); }
+
+  .top-actions { display: flex; gap: 8px; }
+
+  .ghost-btn {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 9px;
+    padding: 8px 14px;
+    font-size: 12.5px;
+    font-weight: 550;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+
+  .ghost-btn:hover { color: var(--text); border-color: #394152; background: rgba(255,255,255,0.025); }
+  .ghost-btn.small { padding: 6px 11px; font-size: 12px; }
+
+  /* ---------- toolbar ---------- */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    min-height: 38px;
+    margin-bottom: 18px;
+  }
+
+  .tool-group { display: flex; align-items: center; gap: 8px; }
+  .tool-label { color: var(--dim); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+
+  .seg {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--border-soft);
+    background: var(--elev);
+    border-radius: 10px;
+  }
+
+  .seg button {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    padding: 6px 13px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    transition: color 0.15s, background 0.15s;
+    white-space: nowrap;
+  }
+
+  .seg button:hover { color: var(--text); }
+  .seg button.active { color: var(--accent); background: var(--accent-soft); }
+
+  .tool-select {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--elev) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23818b9f' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+    color: var(--text);
+    padding: 7px 32px 7px 13px;
+    border-radius: 9px;
+    font-size: 12.5px;
+    max-width: 300px;
+  }
+
+  .tool-select:focus { outline: none; border-color: var(--accent-line); }
+
+  .tool-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid rgba(232, 185, 35, 0.2);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ---------- hud ---------- */
+  .hud {
+    display: flex;
+    align-items: flex-end;
+    gap: 30px;
+    margin-bottom: 14px;
+  }
+
+  .hud-stat { display: flex; flex-direction: column; gap: 2px; min-width: 58px; }
+
+  .hud-label {
+    font-size: 10.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+  }
+
+  .hud-value {
+    font-family: var(--font-mono);
+    font-size: 27px;
+    line-height: 1.15;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .hud-stat.muted .hud-value { color: var(--muted); }
+
+  .hud-progress { flex: 1; padding-bottom: 9px; }
+
+  .progress-track {
+    height: 5px;
+    border-radius: 999px;
+    background: var(--elev-2);
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #d9a90f, var(--accent));
+    transition: width 0.12s linear;
+  }
+
+  .hud-actions { display: flex; gap: 8px; padding-bottom: 3px; }
+
+  /* ---------- stage ---------- */
+  .stage {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.018), transparent 38%),
+      var(--elev);
+    padding: 26px 30px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255,255,255,0.025);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+  }
+
+  .stage:focus-within {
+    border-color: rgba(232, 185, 35, 0.32);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(232, 185, 35, 0.06);
+  }
+
+  .stage.paused { border-color: var(--border); }
+
+  .text-viewport {
+    position: relative;
+    overflow: hidden;
+    height: calc(3 * 1.9 * 27px);
+    scrollbar-width: none;
+  }
+
+  .text-viewport::-webkit-scrollbar { display: none; }
+
+  .text {
+    position: relative;
+    white-space: normal;
+    user-select: none;
+    color: var(--dim);
+    font-size: 27px;
+    line-height: 1.9;
+    letter-spacing: 0.01em;
+  }
+
+  .stage.mode-zh .text {
+    font-family: var(--font-zh);
+    font-size: 28px;
+    line-height: 1.9;
+    letter-spacing: 0.11em;
+  }
+
+  .stage.mode-zh .text-viewport { height: calc(3 * 1.9 * 28px); }
+
+  .stage.mode-en .text {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    line-height: 1.9;
+    letter-spacing: 0.005em;
+  }
+
+  .stage.mode-en .text-viewport { height: calc(3 * 1.9 * 24px); }
+
+  .stage.mode-code .text {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    line-height: 1.8;
+    letter-spacing: 0;
+  }
+
+  .stage.mode-code .text-viewport { height: calc(10 * 1.8 * 16px); }
+
+  .chars {
+    position: relative;
+    white-space: pre-wrap;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  /* 中文可以在任意字之间换行；英文只在空格处换行 */
+  .stage.mode-zh .chars { overflow-wrap: anywhere; }
+
+  .stage.mode-code .chars {
+    white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .code-line { min-height: 1.8em; }
+
+  .line-anchor {
+    display: inline-block;
+    width: 0;
+    height: 1.2em;
+    vertical-align: top;
+  }
+
+  .ch { color: var(--dim); transition: color 0.06s; }
+  .ch.punct { color: #586074; }
+  .ch.space { white-space: pre-wrap; }
+  .stage.mode-code .ch.space { white-space: pre; }
+
+  .ch.correct { color: var(--text); }
+  .ch.correct.punct { color: var(--punct); }
+
+  /* 代码里运算符和括号是正文，不要按标点压暗 */
+  .stage.mode-code .ch.punct { color: inherit; }
+  .stage.mode-code .ch.correct.punct { color: var(--text); }
+  .ch.wrong {
+    color: var(--error);
+    background: var(--error-soft);
+    border-radius: 3px;
+  }
+  .ch.auto { opacity: 0.42; }
+  .ch.active { color: #aeb7c8; }
+
+  .caret {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 1.2em;
+    border-radius: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(232, 185, 35, 0.5);
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+    transition: left 0.055s ease, top 0.055s ease, height 0.1s ease;
+  }
+
+  .caret.visible { opacity: 1; animation: blink 1.15s steps(1, end) infinite; }
+  .caret.solid { animation: none; opacity: 1; }
+
+  @keyframes blink {
+    0%, 54% { opacity: 1; }
+    55%, 100% { opacity: 0; }
+  }
+
+  .composition-preview {
+    position: absolute;
+    z-index: 7;
+    transform: translateY(4px);
+    padding: 4px 9px;
+    border-radius: 7px;
+    background: #262b37;
+    border: 1px solid #3a4152;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+
+  .composition-preview.visible { opacity: 1; }
+
+  .direct-sink {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    outline: 0;
+    resize: none;
+    opacity: 0;
+    background: transparent;
+    color: transparent;
+    caret-color: transparent;
+    cursor: text;
+    z-index: 6;
+  }
+
+  .ime-sink {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 15em;
+    height: 1.9em;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    outline: 0;
+    resize: none;
+    background: transparent;
+    color: transparent;
+    caret-color: transparent;
+    white-space: pre;
+    overflow: hidden;
+    z-index: 5;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    opacity: 1;
+  }
+
+  .stage-hint {
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    top: 5px;
+    height: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    transition: opacity 0.18s;
+    z-index: 3;
+  }
+
+  .stage-hint.hidden { opacity: 0; }
+
+  .hint-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 rgba(232, 185, 35, 0.45);
+    animation: pulse 1.9s infinite;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(232, 185, 35, 0.35); }
+    70% { box-shadow: 0 0 0 8px rgba(232, 185, 35, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(232, 185, 35, 0); }
+  }
+
+  .pause-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(11, 13, 17, 0.62);
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+  }
+
+  .pause-overlay[hidden] { display: none; }
+
+  .pause-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .pause-card span { color: var(--muted); font-size: 12px; font-weight: 400; }
+
+  .ime-warning {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 13;
+    background: #2a2310;
+    border: 1px solid rgba(232, 185, 35, 0.34);
+    color: #f0ce63;
+    font-size: 12px;
+    padding: 7px 13px;
+    border-radius: 8px;
+    white-space: nowrap;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  }
+
+  .ime-warning[hidden] { display: none; }
+
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 14px;
+    color: var(--dim);
+    font-size: 11.5px;
+  }
+
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    padding: 2px 5px;
+    border: 1px solid var(--border);
+    border-bottom-color: #333a48;
+    border-radius: 4px;
+    background: var(--elev);
+    color: var(--muted);
+  }
+
+  /* ---------- overlays / modals ---------- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    background: rgba(6, 8, 11, 0.74);
+    backdrop-filter: blur(7px);
+    animation: overlayIn 0.16s ease;
+  }
+
+  .overlay.hidden { display: none; }
+
+  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    width: min(660px, 100%);
+    max-height: min(86vh, 860px);
+    overflow: auto;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.025), transparent 22%),
+      var(--elev);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 26px 28px;
+    box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+    animation: modalIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .eyebrow {
+    margin: 0 0 5px;
+    color: var(--accent);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .modal h2 { margin: 0; font-size: 21px; letter-spacing: -0.01em; }
+
+  .icon-btn {
+    border: 0;
+    background: var(--elev-2);
+    color: var(--muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    font-size: 18px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .icon-btn:hover { color: var(--text); background: var(--elev-3); }
+
+  /* ---------- settings ---------- */
+  .settings-body { display: flex; flex-direction: column; }
+
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 26px;
+    padding: 17px 0;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .setting-row b { font-size: 13.5px; font-weight: 650; }
+  .setting-row p {
+    margin: 5px 0 0;
+    max-width: 400px;
+    color: var(--muted);
+    font-size: 11.8px;
+    line-height: 1.65;
+  }
+
+  .setting-row code {
+    font-family: var(--font-mono);
+    background: var(--elev-2);
+    border: 1px solid var(--border-soft);
+    padding: 1px 4px;
+    border-radius: 4px;
+    color: #b6bfd0;
+    font-size: 11px;
+  }
+
+  .setting-note {
+    margin-top: 14px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-soft);
+    color: var(--dim);
+    font-size: 11.5px;
+  }
+
+  .switch { position: relative; display: inline-flex; flex: none; }
+  .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .switch span {
+    display: block;
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--elev-3);
+    border: 1px solid var(--border);
+    transition: background 0.18s, border-color 0.18s;
+    position: relative;
+  }
+  .switch span::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #6a7488;
+    transition: transform 0.18s, background 0.18s;
+  }
+  .switch input:checked + span { background: var(--accent-soft); border-color: var(--accent-line); }
+  .switch input:checked + span::after { transform: translateX(18px); background: var(--accent); }
+  .switch input:focus-visible + span { outline: 2px solid var(--accent-line); outline-offset: 2px; }
+
+  /* ---------- result ---------- */
+  .result-modal { width: min(740px, 100%); }
+
+  .result-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 22px;
+  }
+
+  .result-speed {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-speed .num {
+    font-size: 66px;
+    line-height: 0.95;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+  }
+
+  .result-speed .unit { color: var(--muted); font-size: 14px; letter-spacing: 0.06em; }
+
+  .pb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #17140a;
+    background: var(--accent);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 11.5px;
+    font-weight: 750;
+    letter-spacing: 0.02em;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .metric {
+    background: var(--elev-2);
+    border: 1px solid var(--border-soft);
+    border-radius: 11px;
+    padding: 11px 13px;
+  }
+
+  .metric label {
+    display: block;
+    color: var(--dim);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .metric b {
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .metric b small { color: var(--muted); font-size: 11px; font-weight: 400; }
+
+  .weak-section {
+    border-top: 1px solid var(--border-soft);
+    padding-top: 18px;
+    margin-bottom: 22px;
+  }
+
+  .weak-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 13px;
+  }
+
+  .weak-title h3 { margin: 0; font-size: 12px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+
+  .weak-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .weak-panel h4 {
+    margin: 0 0 8px;
+    font-size: 11.5px;
+    color: var(--dim);
+    font-weight: 600;
+  }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    border: 1px solid var(--border);
+    background: var(--elev-2);
+    border-radius: 7px;
+    padding: 4px 8px;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .chip b {
+    color: var(--text);
+    font-family: var(--font-zh);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .chip em { font-style: normal; color: var(--dim); font-size: 10.5px; }
+
+  .chip.error-chip b { color: var(--error); }
+
+  .empty-note { color: var(--dim); font-size: 11.5px; padding: 6px 0; }
+
+  .note-line {
+    margin-top: 12px;
+    padding: 8px 11px;
+    border-radius: 8px;
+    background: var(--elev-2);
+    border: 1px solid var(--border-soft);
+    color: var(--muted);
+    font-size: 11.5px;
+    line-height: 1.6;
+  }
+
+  .heatmap-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+  .heatmap { display: flex; flex-direction: column; gap: 5px; }
+
+  .heat-row { display: flex; gap: 5px; justify-content: center; }
+
+  .heat-key {
+    width: 29px;
+    height: 29px;
+    border-radius: 6px;
+    border: 1px solid var(--border-soft);
+    background: var(--elev-2);
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+  }
+
+  .heat-key.used { color: var(--text); }
+  .heat-key.space { width: 180px; font-size: 9.5px; letter-spacing: 0.1em; }
+  .heat-key.invisible { visibility: hidden; }
+
+  .heat-legend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--dim);
+    font-size: 10.5px;
+  }
+
+  .heat-scale {
+    width: 96px;
+    height: 6px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #252b38, rgba(255, 100, 108, 0.9));
+  }
+
+  .slow-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    justify-content: flex-end;
+    border-top: 1px solid var(--border-soft);
+    padding-top: 19px;
+  }
+
+  .primary-btn {
+    border: 0;
+    background: var(--accent);
+    color: #17140a;
+    border-radius: 9px;
+    padding: 10px 18px;
+    font-size: 12.5px;
+    font-weight: 700;
+    transition: filter 0.15s, transform 0.05s;
+  }
+
+  .primary-btn:hover { filter: brightness(1.07); }
+  .primary-btn:active { transform: translateY(1px); }
+
+  .danger-btn {
+    border: 1px solid rgba(255, 100, 108, 0.26);
+    background: transparent;
+    color: #e7888d;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 11.5px;
+  }
+
+  .danger-btn:hover { background: var(--error-soft); }
+
+  /* ---------- history ---------- */
+  .history-tabs { margin-bottom: 18px; }
+
+  .chart-wrap {
+    min-height: 190px;
+    border: 1px solid var(--border-soft);
+    background: var(--elev-2);
+    border-radius: 13px;
+    padding: 12px 10px 4px;
+  }
+
+  .chart-wrap svg { display: block; width: 100%; height: auto; }
+
+  .chart-empty {
+    min-height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dim);
+    font-size: 12.5px;
+  }
+
+  .best-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0;
+  }
+
+  .best-pill {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    border: 1px solid var(--border);
+    background: var(--elev-2);
+    border-radius: 8px;
+    padding: 7px 11px;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .best-pill b { color: var(--accent); font-family: var(--font-mono); font-size: 14px; }
+
+  .history-list { display: flex; flex-direction: column; }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 10px 2px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .history-item .hi-main { display: flex; align-items: baseline; gap: 10px; }
+  .history-item .hi-speed { color: var(--text); font-family: var(--font-mono); font-size: 14px; font-weight: 600; }
+  .history-item .hi-sub { color: var(--dim); font-size: 11px; }
+  .history-item .hi-right { display: flex; gap: 12px; font-family: var(--font-mono); font-size: 11px; color: var(--dim); }
+
+  .history-foot { display: flex; justify-content: flex-end; margin-top: 16px; padding-top: 15px; border-top: 1px solid var(--border-soft); }
+
+  /* ---------- toast ---------- */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 30px;
+    transform: translate(-50%, 12px);
+    z-index: 80;
+    background: #262c38;
+    border: 1px solid #394152;
+    color: var(--text);
+    font-size: 12.5px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.42);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s, transform 0.18s;
+    max-width: min(560px, calc(100vw - 40px));
+    text-align: center;
+  }
+
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  .hidden { display: none !important; }
+  [hidden] { display: none !important; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 820px) {
+    .app { width: calc(100vw - 28px); padding-top: 18px; }
+    .topbar { flex-wrap: wrap; gap: 12px; }
+    .brand { order: 1; }
+    .top-actions { order: 2; margin-left: auto; }
+    .tabs { order: 3; width: 100%; justify-content: center; }
+    .tab { flex: 1; padding: 8px 10px; }
+    .hud { gap: 16px; flex-wrap: wrap; }
+    .hud-value { font-size: 22px; }
+    .hud-progress { min-width: 100%; order: 5; padding-bottom: 0; }
+    .hud-actions { margin-left: auto; }
+    .stage { padding: 18px 16px; }
+    .text-viewport { height: calc(3 * 1.9 * 22px); }
+    .stage-hint { left: 16px; right: 16px; top: 2px; height: 15px; font-size: 10.5px; }
+    .stage.mode-zh .text { font-size: 23px; }
+    .stage.mode-zh .text-viewport { height: calc(3 * 1.9 * 23px); }
+    .stage.mode-en .text { font-size: 20px; }
+    .stage.mode-en .text-viewport { height: calc(3 * 1.9 * 20px); }
+    .stage.mode-code .text { font-size: 14px; }
+    .stage.mode-code .text-viewport { height: calc(10 * 1.8 * 14px); }
+    .foot { flex-wrap: wrap; gap: 6px 14px; }
+    .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .weak-columns { grid-template-columns: 1fr; }
+    .result-speed .num { font-size: 52px; }
+    .setting-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .modal { padding: 22px 18px; }
+    .heat-key { width: 24px; height: 24px; font-size: 9px; }
+    .heat-key.space { width: 140px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">⌨</span><span>打字练习</span></div>
+    <nav class="tabs" id="modeTabs" aria-label="练习模式">
+      <button class="tab active" data-mode="zh" type="button">中文</button>
+      <button class="tab" data-mode="en" type="button">英文</button>
+      <button class="tab" data-mode="code" type="button">代码</button>
+    </nav>
+    <div class="top-actions">
+      <button class="ghost-btn" id="historyBtn" type="button">记录</button>
+      <button class="ghost-btn" id="settingsBtn" type="button">设置</button>
+    </div>
+  </header>
+
+  <section class="toolbar" id="toolbar" aria-label="练习选项"></section>
+
+  <section class="hud" aria-label="实时数据">
+    <div class="hud-stat">
+      <span class="hud-label" id="speedLabel">字/分</span>
+      <span class="hud-value" id="speedValue">0</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-label">正确率</span>
+      <span class="hud-value" id="accValue">100%</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-label" id="timeLabel">时间</span>
+      <span class="hud-value" id="timeValue">60</span>
+    </div>
+    <div class="hud-progress"><div class="progress-track"><div class="progress-fill" id="progressBar"></div></div></div>
+    <div class="hud-actions">
+      <button class="ghost-btn small" id="finishBtn" type="button" hidden>结束</button>
+      <button class="ghost-btn small" id="restartBtn" type="button">↻ 重开</button>
+    </div>
+  </section>
+
+  <section class="stage" id="stage">
+    <div class="text-viewport" id="textViewport">
+      <div class="text" id="textDisplay"><div class="chars" id="chars"></div><div class="caret" id="caret"></div><div class="composition-preview" id="compositionPreview"></div><textarea class="ime-sink" id="imeSink" rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="中文输入区"></textarea></div>
+      <textarea class="direct-sink" id="directSink" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="打字输入区"></textarea>
+    </div>
+    <div class="stage-hint" id="stageHint"><span class="hint-dot"></span><span id="stageHintText">点击这里，开始输入</span></div>
+    <div class="pause-overlay" id="pauseOverlay" hidden><div class="pause-card">已暂停<span>点击继续</span></div></div>
+    <div class="ime-warning" id="imeWarning" hidden></div>
+  </section>
+
+  <footer class="foot">
+    <span><kbd>Esc</kbd> / <kbd>Tab</kbd> 重开</span>
+    <span id="modeHint">自由模式 · 错了也能继续</span>
+    <span>点击空白处暂停</span>
+  </footer>
+</div>
+
+<div class="overlay hidden" id="resultOverlay"></div>
+
+<div class="overlay hidden" id="settingsOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="设置">
+    <div class="modal-head">
+      <div><p class="eyebrow">设置</p><h2>练习偏好</h2></div>
+      <button class="icon-btn modal-close" data-close="settingsOverlay" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="settings-body">
+      <div class="setting-row">
+        <div>
+          <b>纠错模式</b>
+          <p>自由模式：打错也能继续，最后按正确率结算。严格模式：打错不会前进，必须按对才能继续。</p>
+        </div>
+        <div class="seg" id="correctionSeg">
+          <button data-correction="free" type="button">自由</button>
+          <button data-correction="strict" type="button">严格</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div>
+          <b>标点宽容</b>
+          <p>中文模式接受半角标点，例如用 <code>,</code> 代替 <code>，</code>。只放宽全角/半角，不放过标点种类错误。</p>
+        </div>
+        <label class="switch"><input type="checkbox" id="punctLenient"><span></span></label>
+      </div>
+      <div class="setting-row">
+        <div>
+          <b>自动缩进</b>
+          <p>代码模式换行后自动补齐行首缩进，补上的空格不计入速度和准确率。</p>
+        </div>
+        <label class="switch"><input type="checkbox" id="autoIndent"><span></span></label>
+      </div>
+      <div class="setting-note">设置保存在本机浏览器，下次打开仍然有效。</div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="historyOverlay">
+  <div class="modal history-modal" role="dialog" aria-modal="true" aria-label="练习历史">
+    <div class="modal-head">
+      <div><p class="eyebrow">记录</p><h2>练习历史</h2></div>
+      <button class="icon-btn modal-close" data-close="historyOverlay" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="seg history-tabs" id="historyTabs">
+      <button data-hmode="zh" class="active" type="button">中文</button>
+      <button data-hmode="en" type="button">英文</button>
+      <button data-hmode="code" type="button">代码</button>
+    </div>
+    <div class="chart-wrap" id="historyChart"></div>
+    <div class="best-row" id="historyBest"></div>
+    <div class="history-list" id="historyList"></div>
+    <div class="history-foot"><button class="danger-btn" id="clearHistoryBtn" type="button">清空全部记录</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<noscript><p style="padding:24px;color:#e7ebf3">这个页面需要启用 JavaScript 才能使用。</p></noscript>
+
+<script>
+/* =========================================================
+   内容库
+   - 所有文章均为原创，避免版权问题
+   - 中文标点统一使用全角
+   ========================================================= */
+
+const EN_WORDS = [...new Set(`
+the be to of and a in that have it for not on with as you do at this but by from they we say or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us is are was were been being has had did does doing should may might must shall
+able about above accept across act add address after again against age ago agree air all allow almost alone along already also although always among amount animal another answer anyone anything appear apply area arm around arrive art ask attention aunt available avoid away baby back bad bag ball bank base beautiful become bed before begin behavior behind believe below best better between beyond big bill bird bit black blood blue board body book born both box boy break bring brother build business buy call camera can capital car card care carry case catch cause cell center century certain chair chance change check child choice choose church city class clear climb close clothes club coach cold college color come common company compare complete computer concern condition conference consider continue control cook cool corner cost could country couple course court cover create cross cry culture cup current customer cut dark data daughter day dead deal death decide decision deep defense degree describe design detail determine develop die difference different difficult dinner direction discover discuss disease do doctor dog door down draw dream drive drop drug during each early east easy eat economy edge education effect effort eight either election else employee end energy enjoy enough enter entire environment especially establish even evening event ever every everyone everything evidence exactly example executive exist expect experience expert explain eye face fact factor fail fall family far fast father fear federal feel feeling few field fight figure fill film final finally find fine finger finish fire firm first fish five floor fly focus follow food foot for force foreign forget form former forward four free friend from front full fund future game garden general generation get girl give glass go goal good government great green ground group grow growth guess gun guy hair half hand hang happen happy hard have he head health hear heart heat heavy help her here herself high him himself his history hit hold home hope hospital hot hotel hour house how however huge human hundred husband idea identify if image imagine impact important improve include including increase indeed indicate individual industry information inside instead interest international interview into investment involve issue item its itself job join just keep key kid kill kind kitchen know knowledge land language large last late later laugh law lawyer lay lead leader learn least leave left leg legal less let letter level lie life light like likely line list listen little live local long look lose loss lot love low machine main maintain major make man manage manager many market marriage material matter may maybe me mean measure media medical meet meeting member memory mention message method middle might military million mind minute miss mission model modern moment money month more morning most mother mouth move movement movie much music must my myself name nation national natural nature near nearly necessary need network never new news newspaper next nice night no none nor north not note nothing notice now number occur off offer office officer official often oil ok old on once one only open operation opportunity option or order organization other others our out outside over own owner page pain painting paper parent part participant particular particularly partner party pass past patient pattern pay peace people per perform performance perhaps period person personal phone physical pick picture piece place plan plant play player point police policy political politics poor popular population position positive possible power practice prepare present president pressure pretty prevent price private probably problem process produce product professional program project property protect prove provide public pull purpose push put quality question quickly quite race radio raise range rate rather reach read ready real reality realize really reason receive recent recently recognize record red reduce reflect region relate relationship religious remain remember remove report represent require research resource respond response rest result return reveal rich right rise risk road rock role room rule run safe same save say scene school science score sea season seat second section security see seek seem sell send senior sense series serious serve service set seven several shake share she shoot short should shoulder show side sign significant similar simple simply since sing single sister sit site situation six size skill small smile so social society soldier some somebody someone something sometimes son song soon sort sound source south space speak special specific speech spend sport spring staff stage stand standard star start state station stay step still stop store story strategy street strong structure student study stuff style subject success such suddenly suffer suggest summer support sure surface system table take talk task tax teach teacher team technology television tell ten tend term test than thank that the their them themselves then theory there these they thing think third this those though thought thousand threat three through throughout throw thus time to today together tonight too top total tough toward town trade traditional training travel treat treatment tree trial trip trouble true truth try turn two type under understand unit until up upon us use usually value various very victim view violence visit voice vote wait walk wall want war watch water way we weapon wear week weight well west what whatever when where whether which while white who whole whom whose why wide wife will win wind window wish with within without woman wonder word work worker world worry would write writer wrong yard yeah year yes yet you young your yourself
+`.split(/\s+/).filter(Boolean))];
+
+const EN_ARTICLES = [
+  {
+    title: "The Quiet Power of Habit",
+    text: `Most people imagine that change arrives with a dramatic decision. In reality, the changes that last usually begin with something much smaller: a habit repeated until it becomes invisible. A person who wants to read more does not need a new library; they need twenty minutes before bed. A person who wants to run a marathon does not start with the marathon; they start by putting on their shoes.
+
+Habits are powerful because they remove the cost of deciding. Every choice we make consumes attention, and attention is the most limited resource we have. When a behavior becomes automatic, it stops competing with everything else. We no longer ask ourselves whether to do it; we simply do it. This is why a good routine can feel like a quiet engine running in the background of a busy life.
+
+But habits are also stubborn. They do not care whether they serve us. A person can practice distraction as faithfully as they practice kindness. The key is not to fight an old habit with willpower, but to replace it with a new one that satisfies the same need. If checking your phone fills a moment of boredom, the answer is not to stare at the wall; it is to keep a book where the phone used to be.
+
+Small changes also compound. Twenty minutes of practice every day sounds modest, and it is. Over a year, however, it becomes more than a hundred hours. The person who improves is rarely the one who makes the biggest single effort. It is the one who shows up on ordinary days, when the work feels unremarkable and no one is watching.
+
+So the question is not whether you can change everything at once. You cannot, and you do not need to. The better question is what small action you could repeat tomorrow, and the day after that. Choose something almost too easy, make it visible, and let time do the part that motivation cannot.`
+  },
+  {
+    title: "A Morning in the City",
+    text: `The city is at its most honest before the shops open. At six in the morning, the streets belong to a different set of people: bakers, cleaners, nurses coming off a night shift, and runners who have learned to avoid the heat. The traffic lights change for almost no one. The air still smells of rain from the night before.
+
+I like to walk through the old market at this hour. The stalls are not ready yet, but the work has already begun. A woman arranges tomatoes into a neat pyramid; a man hoses down the pavement and whistles at a dog. Someone is frying dough in a deep pan, and the smell follows me for a whole block. None of this is remarkable, and that is exactly why I notice it. During the day, the same street will be loud and crowded, and I will walk through it without seeing anything at all.
+
+By seven, the first buses arrive. Students with headphones stand in a loose line; office workers hold coffee and check their phones. The city begins to assemble itself, piece by piece, like a machine that has been switched on. For a few minutes, the early crowd and the late night crowd share the same pavement, and then they separate, each group disappearing into its own version of the day.
+
+I often think that a city is not really made of buildings. It is made of these small routines, repeated by millions of people who will never meet. The baker does not know the nurse; the runner does not know the student waiting for the bus. Yet their schedules fit together, and the whole thing works. There is something comforting about that, even if it is also a little lonely.
+
+By eight, the market is full and the streets are ordinary again. I finish my coffee, join the crowd, and become just another person in a hurry.`
+  },
+  {
+    title: "Why We Read",
+    text: `We read for many reasons, and not all of them are noble. We read to pass the time on a train, to learn how to fix a sink, to fall asleep, to feel less alone. Sometimes we read because everyone else is reading the same book and we do not want to be left out of the conversation. None of these reasons is a bad one.
+
+The strange thing about reading is how private it is. A film can make a room laugh together; a song can turn a crowd into a single voice. A book asks you to sit still and build the world yourself. Two people can read the same paragraph and imagine entirely different rooms, faces, and weather. The words are shared, but the experience is not.
+
+This privacy is also why reading can be so useful. A book gives you a place to think without being watched. You can disagree with the author, put the book down, and come back a year later. You can underline a sentence that you are not ready to explain. In a world that rewards quick reactions, reading offers the rare pleasure of a slow one.
+
+I do not remember most of the books I have read. I remember a few sentences, a handful of characters, and the feeling of certain afternoons. Perhaps that is enough. A book does not have to stay in your memory to change the way you see things. Sometimes it leaves behind a question, and the question turns out to be more valuable than the answer.
+
+So I keep a book near the door, another by the bed, and a third in my bag. I rarely finish them on schedule. But they are there, waiting, and that is a kind of company.`
+  },
+  {
+    title: "The Shape of the Internet",
+    text: `When people describe the internet, they often use the language of space. We talk about visiting a site, entering a room, browsing a market, or getting lost down a rabbit hole. These metaphors are useful, but they hide something important: the internet is not a place. It is a set of decisions, made by people, about what should be easy and what should be hard.
+
+Consider the simple act of opening an app. The designers have chosen which buttons appear first, which notifications arrive, and which actions require an extra tap. None of these choices is neutral. A feed that loads endlessly is not an accident; it is a design decision that makes stopping slightly harder. A message that disappears after a few seconds is not magic; it is a rule about memory.
+
+This does not mean that technology is evil or that its creators are villains. Most of these choices are made to solve real problems, and many of them work well. But it does mean that we should be curious about the shape of the tools we use. What does this app make easy? What does it make difficult? What would I do differently if the button were somewhere else?
+
+The good news is that attention is trainable. We can notice the moment an app pulls us away and choose to return. We can keep a book where the phone usually sits. We can decide that some hours are for deep work and others are for messages. These are small acts, but they add up to a kind of authorship over our own days.
+
+The internet will keep changing, and so will the decisions behind it. The useful skill is not memorizing which platform is good or bad today. It is learning to see the design, ask who benefits, and then choose, deliberately, how much of your life you want to hand over to it.`
+  }
+];
+
+/* 常用字（按频率排列，运行时去重后取前 600 个） */
+const ZH_CHARS_RAW = `的一是不了在人有我他这个们中来上大为和国地到以说时要就出会可也你对生能而子那得于着下自之年过发后作里用道行所然家种事成方多经么去法学如都同现当没动面起看定天分还进好小部其些主样理心她本前开但因只从想实日军者意无力它与长把机十民第公此已工使情明性知全三又关点正业外将两高间由问很最重并物手应战向头文体政美相见被利什二等产或新己制身果加西斯月话合回特代内信表化老给世位次度门任常先海通教儿原东声提立及比员解水名真论处走义各入几口认条平系气题活尔更别打女变四神总何电数安少报才结反受目太量再感建务做接必场件计管期市直德资命山金指克许统区保至队形社便空决治展马科司五基眼书非则听白却界达光放强即像难且权思王象完设式色路记南品住告类求据程北边死张该交规万取拉格望觉术领共确传师观清今切院让识候带导争运笑飞风步改收根干造言联持组每济车亲极林服快办议往元英士证近失转夫令准布始怎呢存未远叫台单影具罗字爱击流备兵连调深商算质团集百需价花党华城石级整府离况亚请技际约示复病息究线似官火断精满支视消越器容照须九增研写称企八功吗包片史委乎查轻易早曾除农找装广显吧阿李标谈吃图念六引历首医局突专费号尽另周较注语仅考落青随选列武红响虽推势参希古众构房半节土投某案黑维革划敌致陈律足态护七兴派孩验责营星够章音跟志底站严巴例防族供效续施留讲型料终答紧黄绝奇察母京段依批群项故按河米围江织害斗双境客纪采举杀攻父苏密低朝友诉止细愿千值仍男钱破网热助倒育属坐帝限船脸职速刻乐否刚威毛状率甚独球般普怕弹校苦创假久错承印晚兰试股拿脑预谁益阳若哪微尼继送急血惊伤素药适波夜省初喜卫源食险待述陆习置居劳财环排福纳欢雷警获模充负云停木游龙树疑层冷洲冲射略范竟句室异激汉村哈策演简卡罪判担州静退既衣您宗积余痛检差富灵协角占配征修皮挥胜降阶审沉坚善妈刘读啊超免压银买皇养伊怀执副乱抗犯追帮宣佛岁航优怪香著田铁控税左右份穿艺背阵草脚概恶块顿敢守酒岛托央户烈洋哥索胡款靠评版宝座释景顾弟登货互付伯慢欧换闻危忙核暗姐介坏讨丽良序升监临亮露永呼味野架域沙掉括舰鱼杂误湾吉减编楚肯测败屋跑梦散温困剑渐封救贵枪缺楼县尚毫移娘朋画班智亦耳恩短掌恐遗固席松秘谢鲁遇康虑幸均销钟诗藏赶剧票损忽巨炮旧端探湖录叶春乡附吸予礼港雨呀板庭妇归睛饭额含顺输摇招婚脱补谓督毒油疗旅泽材灭逐莫笔亡鲜词圣择寻厂睡博勒烟授诺伦岸奥唐卖俄炸载洛健堂旁宫喝借君禁阴园谋宋避抓荣姑孙逃牙束跳顶玉镇雪午练迫爷篇肉嘴馆遍凡础洞卷坦牛宁纸诸训私庄祖丝翻暴森塔默握戏隐熟骨访弱蒙歌店鬼软典欲萨伙遭盘爸扩盖弄雄稳忘亿刺拥徒姆杨齐赛趣曲刀床迎冰虚玩析窗醒妻透购替塞努休虎扬途侵刑绿兄迅套贸毕唯谷轮库迹尤竞街促延震弃甲伟麻川申缓潜闪售灯针哲络抵朱埃抱鼓植纯夏忍页杰筑折郑贝尊吴秀混臣雅振染盛怒舞圆搞狂措姓残秋培迷诚宽宇猛摆梅毁伸摩盟末乃悲拍丁赵硬麦蒋操耶阻订彩抽赞魔纷沿喊违妹浪汇币丰蓝殊献桌啦瓦莱援译夺汽烧距裁偏符勇触课敬哭懂墙袭召罚侠厅拜巧侧韩冒债曼融惯享戴童犹乘挂奖绍厚纵障讯涉彻刊丈爆乌役描洗玛患妙镜唱烦签仙彼弗症仿倾牌陷鸟轰咱菜闭奋庆撤泪茶疾缘播朗杜奶季丹狗尾仪偷奔珠虫驻孔宜艾桥淡翼恨繁寒伴叹旦愈潮粮缩罢聚径恰挑袋灰捕徐珍幕映裂泰隔启尖忠累炎暂估泛荒偿横拒瑞忆孤鼻闹羊呆厉衡胞零穷舍码赫婆魂灾洪腿胆津俗辩胸晓劲贫仁偶辑邦恢赖圈摸仰润堆碰艇稍迟辆废净凶署壁御奉旋冬矿抬蛋晨伏吹鸡倍糊秦盾杯租骑乏隆诊奴摄丧污渡旗甘耐凭扎抢绪粗肩梁幻菲皆碎宙叔岩荡综爬荷悉蒂返井壮薄悄扫敏碍殖详迪矛霍允幅撒剩凯颗骂赏液番箱贴漫酸郎腰舒眉忧浮辛恋餐吓挺励辞艘键伍峰尺昨黎辈贯侦滑券崇扰宪绕趋慈乔阅汗枝拖墨胁插箭腊粉泥氏彭拔骗凤慧媒佩愤扑龄驱惜豪掩兼跃尸肃帕驶堡届欣惠册储飘桑闲惨洁踪勃宾频仇磨递邪撞拟滚奏巡颜剂绩贡疯坡瞧截燃焦殿伪柳锁逼颇昏劝呈搜勤戒驾漂饮曹朵仔柔俩孟腐幼践籍牧凉牲佳娜浓芳稿竹腹跌逻垂遵脉貌柏狱猜怜惑陶兽帐饰贷昌叙躺钢沟寄扶铺邓寿惧询汤盗肥尝匆辉奈扣廷澳嘛董迁凝慰厌脏腾幽怨鞋丢埋泉涌辖躲晋紫艰魏吾慌祝邮吐狠鉴曰械咬邻赤挤弯椅陪割揭韦悟聪雾锋梯猫祥阔誉筹丛牵鸣沈阁穆屈旨袖猎臂蛇贺柱抛鼠瑟戈牢逊迈欺吨琴衰瓶恼燕仲诱狼池疼卢仗冠粒遥吕玄尘冯抚浅敦缠`;
+
+const ZH_CHARS = [...new Set(Array.from(ZH_CHARS_RAW))].slice(0, 600);
+
+const ZH_WORDS = [...new Set(`
+我们 你们 他们 她们 它们 自己 什么 怎么 这个 那个 这样 那样 因为 所以 但是 如果 虽然 已经 可以 应该 需要 可能 觉得 知道 认为 希望 喜欢 开始 结束 工作 学习 生活 时间 今天 明天 昨天 现在 以后 以前 地方 东西 事情 问题 办法 方法 世界 国家 社会 学校 老师 学生 朋友 家人 父母 孩子 身体 心情 天气 太阳 月亮 星星 天空 大海 城市 农村 公园 商店 医院 银行 电脑 手机 网络 信息 数据 系统 程序 代码 文件 内容 结果 原因 变化 发展 提高 增加 减少 解决 发现 出现 发生 选择 决定 准备 完成 继续 努力 认真 仔细 清楚 简单 复杂 重要 主要 特别 非常 一定 真正 直接 实际 基本 一般 普通 特殊 相同 不同 安全 健康 快乐 幸福 美丽 干净 安静 热闹 方便 舒服 困难 容易 紧张 放松 有趣 无聊 奇怪 正常 正确 错误 成功 失败 经验 教训 机会 挑战 目标 计划 梦想 未来 过去 历史 文化 艺术 音乐 电影 书籍 故事 语言 文字 汉字 拼音 输入 练习 记忆 思考 理解 表达 交流 讨论 意见 建议 帮助 支持 鼓励 感谢 抱歉 对不起 没关系 再见 你好 早上 中午 晚上 吃饭 睡觉 起床 休息 运动 散步 旅行 旅游 风景 照片 礼物 生日 节日 春节 中秋 国庆 夏天 冬天 春天 秋天 下雨 下雪 刮风 阳光 空气 自然 环境 动物 植物 花朵 树林 河流 山峰 地球 宇宙 科学 技术 研究 实验 数学 物理 化学 生物 经济 政治 法律 新闻 广告 产品 市场 价格 质量 服务 客户 公司 工厂 农业 工业 交通 汽车 火车 飞机 地铁 公交 道路 桥梁 建筑 房屋 房间 厨房 卧室 客厅 窗户 门口 桌子 椅子 床上 衣服 鞋子 帽子 眼镜 颜色 红色 蓝色 绿色 黄色 黑色 白色 数字 第一 第二 最后 左边 右边 前面 后面 上面 下面 里面 外面 中间 旁边 附近 远处 这里 那里 哪里 每次 每天 每年 一些 一点 很多 不少 全部 大部分 其他 另外 而且 并且 或者 还是 不但 甚至 例如 比如 其实 当然 确实 也许 大概 差不多 马上 立刻 终于 仍然 正在 将要 曾经 从来 一直 总是 经常 有时 偶尔 很少 从不 必须 千万 不要 分别 一起 共同 互相 各自 单独 亲自 主动 被动 积极 消极 优点 缺点 长处 短处 兴趣 爱好 习惯 态度 性格 能力 水平 成绩 分数 排名 比赛 足球 篮球 游泳 跑步 唱歌 跳舞 画画 读书 写字 听歌 看电影 玩游戏 上网 购物 聊天 打电话 发消息 看新闻 做作业 上课 考试 放假 开学 毕业 就业 面试 工资 收入 支出 存款 投资 风险 保险 合同 规则 制度 政策 政府 人民 群众 个人 集体 团队 合作 竞争 和平 战争 自由 平等 公平 正义 道德 文明 传统 现代 古代 年轻 年老 男生 女生 大人 小孩 青年 老人 医生 护士 警察 司机 工人 农民 商人 律师 记者 演员 歌手 作家 画家 科学家 工程师 程序员 经理 老板 同事 同学 邻居 客人 主人 服务员 售货员 运动员 教练 队员 观众 读者 作者 用户 会员 志愿者 陌生人 熟人 恋人 夫妻 丈夫 妻子 儿子 女儿 哥哥 姐姐 弟弟 妹妹 爷爷 奶奶 外公 外婆 叔叔 阿姨 表哥 表妹 堂哥 堂妹 侄子 侄女 孙子 孙女 女婿 媳妇 亲戚 一心一意 三心二意 井井有条 实事求是 循序渐进 熟能生巧 温故知新 举一反三 全神贯注 持之以恒 日积月累 脚踏实地 精益求精 一丝不苟 有条不紊 从容不迫 心平气和 聚精会神 自然而然 恰到好处
+`.split(/\s+/).filter(Boolean))];
+
+const ZH_ESSAYS = [
+  {
+    title: "城市清晨",
+    text: `清晨六点，城市还没有完全醒来。街道上只有零星的车辆，路边的早餐店已经亮起灯，热气从窗口缓缓升起。环卫工人推着小车，把昨夜的落叶扫成一堆。远处的公交站台前，站着几个赶早班的人，他们低头看手机，偶尔抬头张望。太阳从楼群后面升起来，把玻璃幕墙染成金色。我沿着河边慢慢走，看见有人在跑步，有人在打太极，还有一位老人坐在长椅上喂鸽子。风从水面吹过来，带着一点潮湿的味道。这一刻，城市显得安静而温柔，好像所有的匆忙都还没有开始。我想，也许每个城市都有这样的时刻，只要你愿意早起，就能看见它不为人知的一面。那些白天里被忽略的声音，此刻都变得清楚：扫帚摩擦地面的沙沙声，远处传来的鸟叫，还有早餐店老板招呼客人的笑声。它们拼在一起，成了这座城市最朴素的早晨。`
+  },
+  {
+    title: "关于坚持",
+    text: `很多事情开始的时候都很热闹，坚持下来却很难。第一天跑步，你会觉得自己充满力量；第一周学一门新技能，你会被新鲜感推着往前走。真正考验人的，是热度退去之后那些普通的日子。窗外下着雨，工作又很累，你很容易给自己找一个合理的借口：明天再开始吧。可是明天也有明天的困难，如果每次都把今天推给明天，计划就会慢慢变成一句空话。有人说：“坚持就是胜利。”这句话听起来简单，做起来却需要一点耐心。坚持并不是要求你每天都做到完美。有时候你只能完成计划的一小部分，有时候你甚至需要停下来休息。重要的是，休息之后还愿意回来。就像春天的种子，表面上看不见变化，根却一直在土壤里生长。等你回头的时候，会发现那些看似微小的努力，已经连成了一条路。所以，不必急着证明自己，也不必因为一次中断就否定全部。把目标拆小一点，把脚步放稳一点，日子久了，时间自然会给出答案。`
+  },
+  {
+    title: "一次旅行",
+    text: `去年秋天，我一个人去了一趟山里。出发前，我做了详细的计划，甚至连每天几点吃饭都写在本子上。可是到了那里才发现，山路比想象中难走，天气也变化得很快。第一天下午，一场大雨打乱了所有安排，我只好躲进路边的小店，点了一碗热汤面。店主是一位五十多岁的阿姨（后来我才知道，她在这里住了三十年），她一边擦桌子，一边和我聊天。她说，山里的天气就是这样，急也没有用，等雨停了再走就好。那天我在店里坐了两个小时，看雨从屋檐上落下来，听她讲附近村子的事情。后来雨停了，天空出现一道很淡的彩虹。我改变了原来的路线，沿着一条小路慢慢走，反而看见了计划之外的风景。旅行让我明白，安排得再周密，也总会遇到意外。与其和意外较劲，不如留一点余地，接受它带来的另一种可能。回到城里以后，我常常想起那碗热汤面和那道彩虹，它们比任何一张照片都更清楚。`
+  },
+  {
+    title: "读书的意义",
+    text: `读书有什么用？这个问题听起来简单，回答起来却不容易。有人说读书可以增长知识，有人说读书可以改变命运，还有人说读书只是消磨时间。这些答案都对，但都不完整。在我看来，读书最大的好处，是让人有机会安静下来，认真听别人把话说完。一本好书不会急着给你结论，它会把一个问题慢慢展开，让你看见不同的立场和选择。读得多了，你会发现自己原来的想法并不是唯一正确的，世界也比想象中复杂。这种认识不会立刻带来什么实际的收益，却会悄悄改变你看待事情的方式。当然，读书并不是万能的。书里的知识可能过时，作者的观点也可能有偏见。所以读书的时候，既要愿意相信，也要保持怀疑。真正重要的不是记住多少句子，而是学会思考：这句话为什么这样说？如果换一个角度，会不会有别的答案？读书是一件很慢的事情，它的回报也来得很慢。但正因为慢，它才不容易被拿走。`
+  },
+  {
+    title: "家乡的秋天",
+    text: `我的家乡在一个不大的县城，秋天是最舒服的季节。夏天的炎热刚刚退去，风里带着一点凉意，天空也比平时更高更蓝。街道两旁的梧桐树开始落叶，风一吹，叶子就在地上打着旋儿。小时候，我最喜欢跟着爷爷去菜市场。秋天的市场格外热闹，摊子上堆着新收的花生、红薯和玉米，空气里混着炒栗子的香味。爷爷总会买一袋热乎乎的糖炒栗子，装在纸袋里递给我，让我慢慢吃。回家的路上，我们会经过一条小河。河水不深，岸边长满了芦苇，风一吹，白色的芦花就轻轻地摇。傍晚的时候，家家户户的灯陆续亮起来，饭菜的香味从窗户里飘出来。现在我在外地工作，很少能赶上家乡的秋天。偶尔在超市看见卖栗子的摊位，我就会想起那条小河，想起爷爷走路时略微驼背的样子。原来，秋天不只是一种天气——它还藏着许多回不去的时光。`
+  },
+  {
+    title: "学会提问",
+    text: `在学习中，提问往往比回答更重要。一个只会背答案的人，遇到新的问题就容易不知所措；而一个会提问的人，即使暂时不知道答案，也知道该往哪个方向寻找。提问的第一步，是承认自己不懂。很多人害怕在别人面前暴露无知，于是把疑问藏在心里，结果问题越积越多。其实，承认不懂并不可耻，它恰恰是学习的开始。第二步，是把问题说清楚。不要只问“为什么不对”，而要说清楚自己做到了哪一步，在哪里卡住，已经尝试过什么。一个具体的问题，往往能换来具体的帮助。第三步，是继续追问。得到答案以后，不要急着点头，可以再问一句：这个结论在什么条件下成立？有没有例外？还有没有别的可能？好的提问会像一盏灯，不仅照亮眼前的问题，也照亮更远的地方。当然，提问也需要尊重。不要用问题去为难别人，也不要把自己的思考完全交给别人。提问的最终目的，是让自己慢慢具备独立寻找答案的能力。`
+  }
+];
+
+const PY_SNIPPETS = [
+  {
+    title: "变量与输出",
+    level: "入门",
+    text: `name = "world"
+count = 3
+print("hello", name)
+print("count =", count)`
+  },
+  {
+    title: "算术运算",
+    level: "入门",
+    text: `a = 12
+b = 5
+print(a + b)
+print(a - b)
+print(a * b)
+print(a / b)
+print(a // b, a % b, a ** 2)`
+  },
+  {
+    title: "条件分支",
+    level: "入门",
+    text: `score = 86
+if score >= 90:
+    level = "A"
+elif score >= 75:
+    level = "B"
+else:
+    level = "C"
+print(level)`
+  },
+  {
+    title: "for 循环",
+    level: "入门",
+    text: `total = 0
+for i in range(1, 11):
+    total += i
+print("sum =", total)`
+  },
+  {
+    title: "while 循环",
+    level: "入门",
+    text: `n = 10
+while n > 0:
+    print(n)
+    n -= 1
+print("done")`
+  },
+  {
+    title: "列表基础",
+    level: "基础",
+    text: `fruits = ["apple", "banana", "cherry"]
+fruits.append("orange")
+for fruit in fruits:
+    print(fruit)
+print(len(fruits))`
+  },
+  {
+    title: "列表推导式",
+    level: "基础",
+    text: `numbers = [1, 2, 3, 4, 5, 6]
+squares = [n * n for n in numbers]
+evens = [n for n in numbers if n % 2 == 0]
+print(squares)
+print(evens)`
+  },
+  {
+    title: "字典遍历",
+    level: "基础",
+    text: `ages = {"alice": 24, "bob": 31}
+ages["carol"] = 28
+for name, age in ages.items():
+    print(name, age)
+print(ages.get("dave", 0))`
+  },
+  {
+    title: "函数与默认参数",
+    level: "基础",
+    text: `def greet(name, greeting="hello"):
+    message = greeting + ", " + name
+    return message
+
+print(greet("alice"))
+print(greet("bob", "hi"))`
+  },
+  {
+    title: "字符串处理",
+    level: "基础",
+    text: `text = "  Hello, Python!  "
+clean = text.strip()
+print(clean.lower())
+print(clean.upper())
+print(clean.replace("Python", "World"))
+print(clean.split(", "))`
+  },
+  {
+    title: "读取文件",
+    level: "进阶",
+    text: `with open("data.txt", "r", encoding="utf-8") as f:
+    for line in f:
+        line = line.strip()
+        if line:
+            print(line)`
+  },
+  {
+    title: "异常处理",
+    level: "进阶",
+    text: `try:
+    value = int("42")
+    result = 100 / value
+except ValueError:
+    print("not a number")
+except ZeroDivisionError:
+    print("cannot divide by zero")
+else:
+    print(result)`
+  },
+  {
+    title: "类与对象",
+    level: "进阶",
+    text: `class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def distance(self, other):
+        dx = self.x - other.x
+        dy = self.y - other.y
+        return (dx * dx + dy * dy) ** 0.5
+
+p = Point(0, 0)
+q = Point(3, 4)
+print(p.distance(q))`
+  },
+  {
+    title: "enumerate 与 zip",
+    level: "进阶",
+    text: `names = ["alice", "bob", "carol"]
+scores = [92, 85, 78]
+for rank, (name, score) in enumerate(zip(names, scores), 1):
+    print(rank, name, score)`
+  },
+  {
+    title: "二分查找",
+    level: "挑战",
+    text: `def binary_search(items, target):
+    low, high = 0, len(items) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if items[mid] == target:
+            return mid
+        if items[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+
+data = [1, 3, 5, 7, 9, 11]
+print(binary_search(data, 7))`
+  },
+  {
+    title: "词频统计",
+    level: "挑战",
+    text: `text = "the quick brown fox jumps over the lazy dog"
+counts = {}
+for word in text.split():
+    counts[word] = counts.get(word, 0) + 1
+for word, count in sorted(counts.items()):
+    print(word, count)`
+  }
+];
+</script>
+<script>
+/* =========================================================
+   打字练习 · 应用逻辑
+   两种输入适配器：
+   1) DirectInput  英文 / 代码，keydown 直接比对
+   2) IMEInput     中文，输入法上屏后按已提交文本比对
+   ========================================================= */
+(() => {
+  'use strict';
+
+  /* ---------------- helpers ---------------- */
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+  const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+  const nowMs = () => performance.now();
+  const PUNCT_RE = /[\p{P}\p{S}]/u;
+  const isPunct = (ch) => !!ch && PUNCT_RE.test(ch);
+
+  const PUNCT_GROUPS = [
+    ['，', ','], ['。', '.'], ['？', '?'], ['！', '!'],
+    ['；', ';'], ['：', ':'], ['（', '('], ['）', ')'],
+    ['“', '"'], ['”', '"'], ['‘', "'"], ['’', "'"],
+    ['—', '-']
+  ];
+
+  function punctEquivalent(a, b) {
+    if (a === b) return true;
+    for (const group of PUNCT_GROUPS) {
+      if (group.includes(a) && group.includes(b)) return true;
+    }
+    return false;
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function esc(value) {
+    return String(value).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function clampInt(value, min, max, fallback) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return fallback;
+    return clamp(Math.round(n), min, max);
+  }
+
+  function readJSON(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (err) {
+      return fallback;
+    }
+  }
+
+  function writeJSON(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (err) {
+      /* 隐私模式或空间不足时静默失败 */
+    }
+  }
+
+  /* ---------------- storage keys ---------------- */
+  const SETTINGS_KEY = 'typing-practice.settings.v1';
+  const PREFS_KEY = 'typing-practice.prefs.v1';
+  const HISTORY_KEY = 'typing-practice.history.v1';
+
+  const DEFAULT_SETTINGS = { correction: 'free', punctLenient: false, autoIndent: true };
+
+  function loadSettings() {
+    const raw = readJSON(SETTINGS_KEY, {});
+    return {
+      correction: raw.correction === 'strict' ? 'strict' : 'free',
+      punctLenient: !!raw.punctLenient,
+      autoIndent: raw.autoIndent !== false
+    };
+  }
+
+  function loadPrefs() {
+    const raw = readJSON(PREFS_KEY, {});
+    const zhAmount = [30, 60, 120].includes(Number(raw?.zh?.amount)) ? Number(raw.zh.amount) : 60;
+    const enAmount = Number(raw?.en?.wordAmount);
+    const enMode = raw?.en?.wordMode === 'count' ? 'count' : 'time';
+    const validEnAmount = enMode === 'count'
+      ? ([10, 25, 50].includes(enAmount) ? enAmount : 25)
+      : ([15, 30, 60].includes(enAmount) ? enAmount : 30);
+    return {
+      mode: raw.mode === 'en' || raw.mode === 'code' ? raw.mode : 'zh',
+      zh: {
+        sub: raw?.zh?.sub === 'essay' ? 'essay' : 'words',
+        amount: zhAmount,
+        essay: clampInt(raw?.zh?.essay, 0, ZH_ESSAYS.length - 1, 0)
+      },
+      en: {
+        sub: raw?.en?.sub === 'article' ? 'article' : 'words',
+        wordMode: enMode,
+        wordAmount: validEnAmount,
+        article: clampInt(raw?.en?.article, 0, EN_ARTICLES.length - 1, 0)
+      },
+      code: {
+        snippet: clampInt(raw?.code?.snippet, 0, PY_SNIPPETS.length - 1, 0)
+      }
+    };
+  }
+
+  function loadHistory() {
+    const raw = readJSON(HISTORY_KEY, []);
+    return Array.isArray(raw) ? raw.filter((r) => r && typeof r.speed === 'number') : [];
+  }
+
+  /* ---------------- app state ---------------- */
+  const app = {
+    settings: loadSettings(),
+    prefs: loadPrefs(),
+    history: loadHistory(),
+    mode: 'zh',
+    session: null,
+    ticker: null,
+    composing: false,
+    compositionText: '',
+    punctuationHintShown: false,
+    imeHintShown: false,
+    customZh: null,
+    lastDrillChars: [],
+    historyMode: 'zh',
+    toastTimer: null,
+    imeWarnTimer: null
+  };
+
+  app.mode = app.prefs.mode;
+
+  /* ---------------- DOM ---------------- */
+  const el = {
+    modeTabs: $('#modeTabs'),
+    toolbar: $('#toolbar'),
+    stage: $('#stage'),
+    textViewport: $('#textViewport'),
+    textDisplay: $('#textDisplay'),
+    chars: $('#chars'),
+    caret: $('#caret'),
+    preview: $('#compositionPreview'),
+    imeSink: $('#imeSink'),
+    directSink: $('#directSink'),
+    stageHint: $('#stageHint'),
+    stageHintText: $('#stageHintText'),
+    pauseOverlay: $('#pauseOverlay'),
+    imeWarning: $('#imeWarning'),
+    speedLabel: $('#speedLabel'),
+    speedValue: $('#speedValue'),
+    accValue: $('#accValue'),
+    timeLabel: $('#timeLabel'),
+    timeValue: $('#timeValue'),
+    progressBar: $('#progressBar'),
+    restartBtn: $('#restartBtn'),
+    finishBtn: $('#finishBtn'),
+    modeHint: $('#modeHint'),
+    resultOverlay: $('#resultOverlay'),
+    settingsOverlay: $('#settingsOverlay'),
+    historyOverlay: $('#historyOverlay'),
+    historyTabs: $('#historyTabs'),
+    historyChart: $('#historyChart'),
+    historyBest: $('#historyBest'),
+    historyList: $('#historyList'),
+    clearHistoryBtn: $('#clearHistoryBtn'),
+    correctionSeg: $('#correctionSeg'),
+    punctLenient: $('#punctLenient'),
+    autoIndent: $('#autoIndent'),
+    toast: $('#toast')
+  };
+
+  /* ---------------- content ---------------- */
+  function randomWords(count) {
+    const pool = shuffle(EN_WORDS.slice());
+    const out = [];
+    let i = 0;
+    while (out.length < count) {
+      out.push(pool[i++ % pool.length]);
+      if (i % pool.length === 0) shuffle(pool);
+    }
+    return out.join(' ');
+  }
+
+  function generateZhText(length) {
+    const words = shuffle(ZH_WORDS.slice());
+    let out = '';
+    let i = 0;
+    while (out.length < length) {
+      if (Math.random() < 0.14) {
+        out += ZH_CHARS[Math.floor(Math.random() * ZH_CHARS.length)];
+      } else {
+        out += words[i++ % words.length];
+        if (i % words.length === 0) shuffle(words);
+      }
+    }
+    return out;
+  }
+
+  function buildTarget(cfg) {
+    if (cfg.sub === 'custom') return cfg.target;
+    if (cfg.mode === 'zh') {
+      if (cfg.sub === 'essay') return ZH_ESSAYS[cfg.essay].text;
+      return generateZhText(Math.max(400, cfg.amount * 8));
+    }
+    if (cfg.mode === 'en') {
+      if (cfg.sub === 'article') return EN_ARTICLES[cfg.article].text;
+      if (cfg.wordMode === 'count') return randomWords(cfg.wordAmount);
+      return randomWords(Math.max(100, Math.ceil(cfg.wordAmount * 3.2)));
+    }
+    return PY_SNIPPETS[cfg.snippet].text;
+  }
+
+  function currentConfig() {
+    if (app.mode === 'zh') {
+      if (app.customZh) return { mode: 'zh', sub: 'custom', target: app.customZh.text };
+      const p = app.prefs.zh;
+      if (p.sub === 'essay') return { mode: 'zh', sub: 'essay', essay: p.essay };
+      return { mode: 'zh', sub: 'words', amount: p.amount };
+    }
+    if (app.mode === 'en') {
+      const p = app.prefs.en;
+      if (p.sub === 'article') return { mode: 'en', sub: 'article', article: p.article };
+      return { mode: 'en', sub: 'words', wordMode: p.wordMode, wordAmount: p.wordAmount };
+    }
+    return { mode: 'code', sub: 'snippet', snippet: app.prefs.code.snippet };
+  }
+
+  function sessionTitle(cfg) {
+    if (cfg.mode === 'zh') {
+      if (cfg.sub === 'words') return `中文 · 字词 · ${cfg.amount} 秒`;
+      if (cfg.sub === 'essay') return `中文 · 范文 · ${ZH_ESSAYS[cfg.essay].title}`;
+      return '中文 · 专项练习';
+    }
+    if (cfg.mode === 'en') {
+      if (cfg.sub === 'words') {
+        return `英文 · 单词 · ${cfg.wordAmount} ${cfg.wordMode === 'time' ? '秒' : '词'}`;
+      }
+      return `英文 · 文章 · ${EN_ARTICLES[cfg.article].title}`;
+    }
+    return `代码 · Python · ${PY_SNIPPETS[cfg.snippet].title}`;
+  }
+
+  /* ---------------- session ---------------- */
+  function newSession(cfg, target) {
+    return {
+      cfg,
+      mode: cfg.mode,
+      sub: cfg.sub,
+      target,
+      targetChars: Array.from(target),
+      typed: '',
+      spans: [],
+      indexToSpan: [],
+      lineAnchors: [],
+      lineLastSpan: [],
+      lineOfIndex: [],
+      autoSet: new Set(),
+      status: 'idle',
+      startedAt: 0,
+      lastResume: 0,
+      elapsed: 0,
+      keystrokes: 0,
+      correct: 0,
+      errors: 0,
+      committed: 0,
+      committedCorrect: 0,
+      punctErrors: 0,
+      lenientUsed: 0,
+      keyStats: new Map(),
+      charStats: [],
+      intervals: [],
+      lastInputAt: 0,
+      strict: app.settings.correction === 'strict',
+      finishedReason: ''
+    };
+  }
+
+  function makeSpan(ch, mode) {
+    const sp = document.createElement('span');
+    sp.className = 'ch'
+      + (ch === ' ' ? ' space' : '')
+      + (mode !== 'code' && isPunct(ch) ? ' punct' : '');
+    sp.textContent = ch;
+    sp._base = sp.className;
+    return sp;
+  }
+
+  function renderTarget(target, mode) {
+    const s = app.session;
+    const frag = document.createDocumentFragment();
+    s.spans = new Array(s.targetChars.length).fill(null);
+    s.indexToSpan = new Array(s.targetChars.length).fill(null);
+    s.lineAnchors = [];
+    s.lineLastSpan = [];
+    s.lineOfIndex = [];
+
+    let idx = 0;
+    if (mode === 'code') {
+      const lines = target.split('\n');
+      for (let li = 0; li < lines.length; li++) {
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'code-line';
+
+        const anchor = document.createElement('span');
+        anchor.className = 'line-anchor';
+        lineDiv.appendChild(anchor);
+        s.lineAnchors[li] = anchor;
+
+        let last = null;
+        for (const ch of Array.from(lines[li])) {
+          const sp = makeSpan(ch, mode);
+          lineDiv.appendChild(sp);
+          s.spans[idx] = sp;
+          s.indexToSpan[idx] = sp;
+          s.lineOfIndex[idx] = li;
+          last = sp;
+          idx++;
+        }
+        s.lineLastSpan[li] = last;
+
+        if (li < lines.length - 1) {
+          s.lineOfIndex[idx] = li;
+          idx++;
+        }
+        frag.appendChild(lineDiv);
+      }
+    } else {
+      for (const ch of s.targetChars) {
+        const sp = makeSpan(ch, mode);
+        frag.appendChild(sp);
+        s.spans[idx] = sp;
+        s.indexToSpan[idx] = sp;
+        idx++;
+      }
+    }
+    el.chars.replaceChildren(frag);
+  }
+
+  function lastSpan() {
+    const s = app.session;
+    for (let i = s.spans.length - 1; i >= 0; i--) {
+      if (s.spans[i]) return s.spans[i];
+    }
+    return null;
+  }
+
+  function caretAnchor() {
+    const s = app.session;
+    if (!s || s.targetChars.length === 0) return null;
+    const i = s.typed.length;
+
+    if (i >= s.targetChars.length) {
+      const last = lastSpan();
+      return last ? { el: last, after: true } : null;
+    }
+
+    if (s.mode === 'code' && s.targetChars[i] === '\n') {
+      const line = s.lineOfIndex[i];
+      const last = s.lineLastSpan[line];
+      if (last) return { el: last, after: true };
+      const anchor = s.lineAnchors[line];
+      if (anchor) return { el: anchor, after: false };
+    }
+
+    const sp = s.indexToSpan[i];
+    if (sp) return { el: sp, after: false };
+
+    for (let j = i + 1; j < s.indexToSpan.length; j++) {
+      if (s.indexToSpan[j]) return { el: s.indexToSpan[j], after: false };
+    }
+    const last = lastSpan();
+    return last ? { el: last, after: true } : null;
+  }
+
+  function charsEqual(typedCh, targetCh) {
+    if (typedCh === targetCh) return true;
+    const s = app.session;
+    if (!s || s.mode !== 'zh' || !app.settings.punctLenient || !isPunct(targetCh)) return false;
+    return punctEquivalent(typedCh, targetCh);
+  }
+
+  /* ---------------- view ---------------- */
+  function applyModeClasses(mode) {
+    el.stage.classList.remove('mode-zh', 'mode-en', 'mode-code');
+    el.stage.classList.add(`mode-${mode}`);
+  }
+
+  function ensureVisible() {
+    const s = app.session;
+    if (!s) return;
+    const anchor = caretAnchor();
+    if (!anchor || !anchor.el) return;
+    const vp = el.textViewport;
+    const vr = vp.getBoundingClientRect();
+    const sr = anchor.el.getBoundingClientRect();
+    const pad = 10;
+
+    let dy = 0;
+    if (sr.top < vr.top + pad) dy = sr.top - vr.top - pad;
+    else if (sr.bottom > vr.bottom - pad) dy = sr.bottom - vr.bottom + pad;
+    if (dy) vp.scrollTop += dy;
+
+    let dx = 0;
+    if (sr.left < vr.left + pad) dx = sr.left - vr.left - pad;
+    else if (sr.right > vr.right - pad) dx = sr.right - vr.right + pad;
+    if (dx) vp.scrollLeft += dx;
+  }
+
+  function updateCaret() {
+    const s = app.session;
+    if (!s) return;
+    if (s.status === 'finished') {
+      el.caret.classList.remove('visible');
+      el.preview.classList.remove('visible');
+      return;
+    }
+
+    const anchor = caretAnchor();
+    if (!anchor || !anchor.el) {
+      el.caret.classList.remove('visible');
+      return;
+    }
+
+    const textRect = el.textDisplay.getBoundingClientRect();
+    const r = anchor.el.getBoundingClientRect();
+    const x = r.left - textRect.left + (anchor.after ? r.width : 0);
+    const y = r.top - textRect.top;
+    const height = Math.max(12, r.height * 1.04);
+
+    el.caret.style.left = `${x}px`;
+    el.caret.style.top = `${y}px`;
+    el.caret.style.height = `${height}px`;
+    el.caret.classList.add('visible');
+    el.caret.classList.toggle('solid', s.status === 'paused');
+
+    if (s.mode === 'zh') {
+      el.imeSink.style.left = `${x}px`;
+      el.imeSink.style.top = `${y}px`;
+      el.imeSink.style.height = `${height}px`;
+      el.imeSink.style.lineHeight = `${height}px`;
+    }
+
+    el.preview.style.left = `${x}px`;
+    el.preview.style.top = `${y + height}px`;
+  }
+
+  function updateHint() {
+    const s = app.session;
+    if (!s) return;
+    const idle = s.status === 'idle';
+    el.stageHint.classList.toggle('hidden', !idle);
+    if (idle) {
+      el.stageHintText.textContent = s.mode === 'zh'
+        ? '点击这里，用中文输入法开始'
+        : '点击这里，开始输入';
+    }
+  }
+
+  function updateView() {
+    const s = app.session;
+    if (!s) return;
+    const active = s.typed.length;
+
+    for (let i = 0; i < s.spans.length; i++) {
+      const sp = s.spans[i];
+      if (!sp) continue;
+      let cls = sp._base;
+      if (i < s.typed.length) {
+        cls += charsEqual(s.typed[i], s.targetChars[i]) ? ' correct' : ' wrong';
+        if (s.autoSet.has(i)) cls += ' auto';
+      }
+      if (i === active && s.status !== 'finished') cls += ' active';
+      sp.className = cls;
+    }
+
+    ensureVisible();
+    updateCaret();
+    updateHUD();
+    updateHint();
+  }
+
+  /* ---------------- timing ---------------- */
+  function timeLimitMs(s) {
+    if (!s) return 0;
+    if (s.mode === 'zh' && s.sub === 'words') return s.cfg.amount * 1000;
+    if (s.mode === 'en' && s.sub === 'words' && s.cfg.wordMode === 'time') {
+      return s.cfg.wordAmount * 1000;
+    }
+    return 0;
+  }
+
+  function isTimed(s) {
+    return timeLimitMs(s) > 0;
+  }
+
+  function activeElapsed(s) {
+    if (!s) return 0;
+    if (s.status === 'running') return s.elapsed + (nowMs() - s.lastResume);
+    return s.elapsed;
+  }
+
+  function startTicker() {
+    stopTicker();
+    app.ticker = setInterval(() => {
+      const s = app.session;
+      if (!s || s.status !== 'running') return;
+      updateHUD();
+      const limit = timeLimitMs(s);
+      if (limit && activeElapsed(s) >= limit) finishSession('time');
+    }, 100);
+  }
+
+  function stopTicker() {
+    if (app.ticker) {
+      clearInterval(app.ticker);
+      app.ticker = null;
+    }
+  }
+
+  function ensureStarted() {
+    const s = app.session;
+    if (!s) return;
+    if (s.status === 'idle') {
+      s.status = 'running';
+      s.startedAt = nowMs();
+      s.lastResume = nowMs();
+      s.lastInputAt = nowMs();
+      startTicker();
+      updateHint();
+    } else if (s.status === 'paused') {
+      resumeSession();
+    }
+  }
+
+  function pauseSession() {
+    const s = app.session;
+    if (!s || s.status !== 'running') return;
+    s.elapsed += nowMs() - s.lastResume;
+    s.status = 'paused';
+    el.pauseOverlay.hidden = false;
+    el.stage.classList.add('paused');
+    updateCaret();
+    updateHint();
+  }
+
+  function resumeSession() {
+    const s = app.session;
+    if (!s || s.status !== 'paused') return;
+    s.status = 'running';
+    s.lastResume = nowMs();
+    s.lastInputAt = nowMs();
+    el.pauseOverlay.hidden = true;
+    el.stage.classList.remove('paused');
+    updateView();
+  }
+
+  /* ---------------- HUD ---------------- */
+  function computeSpeed(s, elapsed) {
+    const minutes = elapsed / 60000;
+    if (minutes <= 0.008) return 0;
+    if (s.mode === 'zh') return s.committedCorrect / minutes;
+    if (s.mode === 'en') return (s.correct / 5) / minutes;
+    return s.correct / minutes;
+  }
+
+  function computeAccuracy(s) {
+    const attempts = s.mode === 'zh' ? s.committed : s.keystrokes;
+    const ok = s.mode === 'zh' ? s.committedCorrect : s.correct;
+    return attempts ? (ok / attempts) * 100 : 100;
+  }
+
+  function updateHUD() {
+    const s = app.session;
+    if (!s) return;
+    const elapsed = activeElapsed(s);
+    const speed = computeSpeed(s, elapsed);
+    const acc = computeAccuracy(s);
+
+    el.speedLabel.textContent = s.mode === 'zh' ? '字/分' : s.mode === 'en' ? 'WPM' : '字符/分';
+    el.speedValue.textContent = String(Math.round(speed));
+    el.accValue.textContent = `${Math.round(acc)}%`;
+
+    const limit = timeLimitMs(s);
+    if (limit) {
+      el.timeLabel.textContent = '剩余';
+      el.timeValue.textContent = String(Math.max(0, Math.ceil((limit - elapsed) / 1000)));
+      el.progressBar.style.width = `${clamp((elapsed / limit) * 100, 0, 100)}%`;
+      el.finishBtn.hidden = true;
+    } else {
+      el.timeLabel.textContent = '用时';
+      el.timeValue.textContent = `${(elapsed / 1000).toFixed(1)}s`;
+      const p = s.targetChars.length ? (s.typed.length / s.targetChars.length) * 100 : 0;
+      el.progressBar.style.width = `${clamp(p, 0, 100)}%`;
+      el.finishBtn.hidden = false;
+    }
+  }
+
+  /* ---------------- direct input ---------------- */
+  function getCharStat(index) {
+    const s = app.session;
+    if (!s.charStats[index]) {
+      s.charStats[index] = { attempts: 0, errors: 0, totalMs: 0 };
+    }
+    return s.charStats[index];
+  }
+
+  function recordKey(code, ok, dt) {
+    if (!code) return;
+    const s = app.session;
+    let st = s.keyStats.get(code);
+    if (!st) {
+      st = { attempts: 0, errors: 0, totalMs: 0 };
+      s.keyStats.set(code, st);
+    }
+    st.attempts++;
+    if (!ok) st.errors++;
+    st.totalMs += dt || 0;
+  }
+
+  function typeDirect(ch, code) {
+    const s = app.session;
+    if (!s || s.status === 'finished' || s.status === 'paused') return;
+    if (s.typed.length >= s.targetChars.length) return;
+
+    ensureStarted();
+
+    const t = nowMs();
+    const i = s.typed.length;
+    const expected = s.targetChars[i];
+    const dt = s.lastInputAt ? t - s.lastInputAt : 0;
+    if (dt >= 30 && dt < 3000) s.intervals.push(dt);
+    s.lastInputAt = t;
+
+    const stat = getCharStat(i);
+    stat.attempts++;
+    stat.totalMs += dt;
+
+    const ok = ch === expected;
+    s.keystrokes++;
+    recordKey(code, ok, dt);
+
+    if (ok) {
+      s.typed += ch;
+      s.correct++;
+    } else {
+      s.errors++;
+      stat.errors++;
+      if (isPunct(expected)) s.punctErrors++;
+      if (s.strict) {
+        flashError(i);
+      } else {
+        s.typed += ch;
+      }
+    }
+
+    if (ok && ch === '\n' && s.mode === 'code' && app.settings.autoIndent) {
+      autoSkipIndent();
+    }
+
+    updateView();
+    checkFinish();
+  }
+
+  function autoSkipIndent() {
+    const s = app.session;
+    const chars = s.targetChars;
+    let i = s.typed.length;
+    if (i > 0 && chars[i - 1] !== '\n') return;
+    while (i < chars.length && chars[i] === ' ') {
+      s.typed += ' ';
+      s.autoSet.add(i);
+      i++;
+    }
+  }
+
+  function backspace() {
+    const s = app.session;
+    if (!s || s.status === 'finished') return;
+    if (s.typed.length === 0) return;
+    s.typed = s.typed.slice(0, -1);
+    for (const i of Array.from(s.autoSet)) {
+      if (i >= s.typed.length) s.autoSet.delete(i);
+    }
+    updateView();
+  }
+
+  function flashError(index) {
+    const s = app.session;
+    const sp = s.spans[index];
+    if (!sp || !sp.animate) return;
+    sp.animate(
+      [
+        { background: 'rgba(255, 100, 108, 0.42)' },
+        { background: 'rgba(255, 100, 108, 0)' }
+      ],
+      { duration: 240, easing: 'ease-out' }
+    );
+  }
+
+  function onDirectKey(e) {
+    const s = app.session;
+    if (!s || s.mode === 'zh') return;
+
+    if (e.isComposing || e.keyCode === 229 || e.key === 'Process') {
+      e.preventDefault();
+      showImeWarning('检测到输入法合成，请切换到英文输入状态');
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      backspace();
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (s.mode === 'code') typeDirect('\n', 'Enter');
+      return;
+    }
+    if (e.key.length !== 1) return;
+
+    e.preventDefault();
+    typeDirect(e.key, e.code || '');
+  }
+
+  /* ---------------- Chinese IME input ---------------- */
+  function handleZhCommitted(text) {
+    const s = app.session;
+    if (!s || s.mode !== 'zh' || s.status === 'finished') return;
+    const chars = Array.from(text);
+    if (!chars.length) return;
+
+    ensureStarted();
+
+    const t = nowMs();
+    const dt = s.lastInputAt ? t - s.lastInputAt : 0;
+    if (dt >= 30 && dt < 3000) s.intervals.push(dt);
+    s.lastInputAt = t;
+    const perCharMs = chars.length ? dt / chars.length : 0;
+
+    for (const ch of chars) {
+      if (s.typed.length >= s.targetChars.length) break;
+      const i = s.typed.length;
+      const expected = s.targetChars[i];
+      const stat = getCharStat(i);
+      stat.attempts++;
+      stat.totalMs += perCharMs;
+      s.committed++;
+
+      const ok = charsEqual(ch, expected);
+      if (ok) {
+        if (ch !== expected) s.lenientUsed++;
+        s.typed += ch;
+        s.committedCorrect++;
+      } else {
+        s.errors++;
+        stat.errors++;
+        if (isPunct(expected)) s.punctErrors++;
+        if (s.strict) {
+          flashError(i);
+          break;
+        }
+        s.typed += ch;
+      }
+    }
+
+    if (s.punctErrors >= 3 && !app.settings.punctLenient && !app.punctuationHintShown) {
+      app.punctuationHintShown = true;
+      showToast('连续标点错误：可能没开中文标点。可在设置里开启“标点宽容”。', 4200);
+    }
+    if (/[a-zA-Z]/.test(text) && !app.imeHintShown) {
+      app.imeHintShown = true;
+      showImeWarning('检测到英文字母，请把输入法切换到中文状态');
+    }
+
+    updateView();
+    checkFinish();
+  }
+
+  function processImeBuffer() {
+    const s = app.session;
+    if (!s || s.mode !== 'zh') return;
+    const text = el.imeSink.value;
+    if (!text) return;
+    el.imeSink.value = '';
+    try { el.imeSink.setSelectionRange(0, 0); } catch (err) { /* noop */ }
+    handleZhCommitted(text);
+  }
+
+  function onZhInput(e) {
+    if (app.composing || e.isComposing) return;
+    processImeBuffer();
+  }
+
+  function onCompStart() {
+    app.composing = true;
+    app.compositionText = '';
+  }
+
+  function onCompUpdate(e) {
+    app.compositionText = e.data || '';
+    showComposition(app.compositionText);
+  }
+
+  function onCompEnd() {
+    app.composing = false;
+    app.compositionText = '';
+    setTimeout(() => {
+      el.preview.classList.remove('visible');
+      processImeBuffer();
+    }, 0);
+  }
+
+  function showComposition(text) {
+    if (!text) {
+      el.preview.classList.remove('visible');
+      return;
+    }
+    el.preview.textContent = text;
+    el.preview.classList.add('visible');
+    updateCaret();
+  }
+
+  function onZhKey(e) {
+    const s = app.session;
+    if (!s || s.mode !== 'zh') return;
+    if (e.isComposing || app.composing || e.keyCode === 229) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      backspace();
+      return;
+    }
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+    }
+  }
+
+  /* ---------------- finish ---------------- */
+  function checkFinish() {
+    const s = app.session;
+    if (!s || s.status === 'finished') return;
+    if (s.typed.length >= s.targetChars.length) finishSession('complete');
+  }
+
+  function finishSession(reason) {
+    const s = app.session;
+    if (!s || s.status === 'finished') return;
+    if (s.status === 'idle') return;
+
+    if (s.status === 'running') {
+      s.elapsed += nowMs() - s.lastResume;
+    }
+    s.status = 'finished';
+    s.finishedReason = reason;
+
+    stopTicker();
+    el.pauseOverlay.hidden = true;
+    el.stage.classList.remove('paused');
+    el.caret.classList.remove('visible');
+    el.preview.classList.remove('visible');
+    el.imeSink.value = '';
+    try { el.imeSink.blur(); } catch (err) { /* noop */ }
+    try { el.directSink.blur(); } catch (err) { /* noop */ }
+
+    updateView();
+    const result = buildResult();
+    saveResult(result);
+    showResult(result);
+  }
+
+  function buildResult() {
+    const s = app.session;
+    const elapsed = activeElapsed(s);
+    const speed = computeSpeed(s, elapsed);
+    const accuracy = computeAccuracy(s);
+    const unit = s.mode === 'zh' ? '字/分' : s.mode === 'en' ? 'WPM' : '字符/分';
+    return {
+      ts: Date.now(),
+      mode: s.mode,
+      sub: s.sub,
+      title: sessionTitle(s.cfg),
+      speed: Math.round(speed),
+      unit,
+      accuracy: Math.round(accuracy * 10) / 10,
+      errors: s.errors,
+      duration: Math.round((elapsed / 1000) * 10) / 10,
+      chars: s.mode === 'zh' ? s.committedCorrect : s.correct,
+      consistency: Math.round(calcConsistency(s.intervals)),
+      punctuationErrors: s.punctErrors,
+      lenientUsed: s.lenientUsed,
+      strict: s.strict
+    };
+  }
+
+  function calcConsistency(intervals) {
+    const xs = intervals.filter((x) => x >= 40 && x <= 2500);
+    if (xs.length < 3) return 100;
+    const mean = xs.reduce((a, b) => a + b, 0) / xs.length;
+    const sd = Math.sqrt(xs.reduce((a, b) => a + (b - mean) ** 2, 0) / xs.length);
+    return clamp(100 * (1 - sd / mean), 0, 100);
+  }
+
+  function saveResult(result) {
+    const same = app.history.filter((r) => r.mode === result.mode && r.title === result.title);
+    result.isFirst = same.length === 0;
+    const best = same.reduce((m, r) => Math.max(m, r.speed), 0);
+    result.isPB = !result.isFirst && result.speed > best;
+    app.history.push(result);
+    if (app.history.length > 800) app.history = app.history.slice(-800);
+    writeJSON(HISTORY_KEY, app.history);
+  }
+
+  /* ---------------- result UI ---------------- */
+  function zhWeak(s) {
+    const map = new Map();
+    for (let i = 0; i < s.charStats.length; i++) {
+      const st = s.charStats[i];
+      if (!st || !st.attempts) continue;
+      const ch = s.targetChars[i];
+      if (!ch || ch === '\n' || ch === ' ' || isPunct(ch)) continue;
+      let item = map.get(ch);
+      if (!item) {
+        item = { ch, attempts: 0, errors: 0, totalMs: 0 };
+        map.set(ch, item);
+      }
+      item.attempts += st.attempts;
+      item.errors += st.errors;
+      item.totalMs += st.totalMs;
+    }
+    const arr = Array.from(map.values());
+    const wrong = arr
+      .filter((x) => x.errors > 0)
+      .sort((a, b) => b.errors - a.errors || b.errors / b.attempts - a.errors / a.attempts)
+      .slice(0, 8);
+    const slow = arr
+      .filter((x) => x.attempts >= 2)
+      .map((x) => ({ ...x, avg: x.totalMs / x.attempts }))
+      .sort((a, b) => b.avg - a.avg)
+      .slice(0, 8);
+    return { wrong, slow, chars: Array.from(new Set([...wrong.map((x) => x.ch), ...slow.map((x) => x.ch)])) };
+  }
+
+  function keyLabel(code) {
+    if (code.startsWith('Key')) return code.slice(3).toLowerCase();
+    if (code.startsWith('Digit')) return code.slice(5);
+    const map = {
+      Backquote: '`', Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']',
+      Backslash: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/',
+      Space: 'space', Enter: '↵', Tab: '⇥'
+    };
+    return map[code] || code;
+  }
+
+  function symbolErrors(s) {
+    let n = 0;
+    for (let i = 0; i < s.charStats.length; i++) {
+      const st = s.charStats[i];
+      if (st && st.errors && isPunct(s.targetChars[i])) n += st.errors;
+    }
+    return n;
+  }
+
+  function heatmapHtml(s) {
+    const rows = [
+      ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal'],
+      ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash'],
+      ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Enter'],
+      ['KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash']
+    ];
+    const stats = s.keyStats;
+    const all = Array.from(stats.entries()).map(([code, st]) => ({
+      code,
+      attempts: st.attempts,
+      errors: st.errors,
+      rate: st.attempts ? st.errors / st.attempts : 0,
+      avg: st.attempts ? st.totalMs / st.attempts : 0
+    }));
+
+    const wrong = all.filter((x) => x.errors >= 2).sort((a, b) => b.rate - a.rate).slice(0, 5);
+    const slow = all.filter((x) => x.attempts >= 3).sort((a, b) => b.avg - a.avg).slice(0, 5);
+
+    const rowsHtml = rows.map((row, ri) => {
+      const keys = row.map((code) => {
+        const st = stats.get(code);
+        const label = keyLabel(code);
+        let style = '';
+        let cls = 'heat-key';
+        if (st && st.attempts) {
+          cls += ' used';
+          const rate = st.errors / st.attempts;
+          style = `background:rgba(255,100,108,${(0.07 + rate * 0.78).toFixed(3)});`
+            + `border-color:rgba(255,100,108,${(0.16 + rate * 0.5).toFixed(3)});`;
+        }
+        const title = st && st.attempts
+          ? `${label} · ${st.attempts} 次 · 错 ${st.errors} 次 · 平均 ${Math.round(st.totalMs / st.attempts)}ms`
+          : `${label} · 未使用`;
+        return `<div class="${cls}" style="${style}" title="${esc(title)}">${esc(label)}</div>`;
+      }).join('');
+      return `<div class="heat-row" style="margin-left:${ri * 14}px">${keys}</div>`;
+    }).join('');
+
+    const spaceSt = stats.get('Space');
+    const spaceStyle = spaceSt && spaceSt.attempts
+      ? `background:rgba(255,100,108,${(0.07 + (spaceSt.errors / spaceSt.attempts) * 0.78).toFixed(3)});`
+      : '';
+    const spaceHtml = `<div class="heat-row"><div class="heat-key space ${spaceSt && spaceSt.attempts ? 'used' : ''}" style="${spaceStyle}" title="空格键">space</div></div>`;
+
+    const wrongText = wrong.length
+      ? `最常错：${wrong.map((x) => `${esc(keyLabel(x.code))} ${Math.round(x.rate * 100)}%`).join(' · ')}`
+      : '没有明显的错误键，表现很稳。';
+    const slowText = slow.length
+      ? `反应最慢：${slow.map((x) => `${esc(keyLabel(x.code))} ${Math.round(x.avg)}ms`).join(' · ')}`
+      : '';
+
+    return `
+      <div class="weak-section">
+        <div class="weak-title">
+          <h3>按键热力图</h3>
+          <div class="heat-legend"><span>错误率</span><span class="heat-scale"></span><span>高</span></div>
+        </div>
+        <div class="heatmap-wrap">
+          <div class="heatmap">${rowsHtml}${spaceHtml}</div>
+          <div class="note-line" style="width:100%">${wrongText}${slowText ? `<br>${slowText}` : ''}</div>
+        </div>
+      </div>`;
+  }
+
+  function resultWeakHtml(s) {
+    if (s.mode !== 'zh') return heatmapHtml(s);
+
+    const weak = zhWeak(s);
+    app.lastDrillChars = weak.chars;
+    const wrongChips = weak.wrong.length
+      ? weak.wrong.map((x) => `<span class="chip error-chip"><b>${esc(x.ch)}</b><em>×${x.errors}</em></span>`).join('')
+      : '<span class="empty-note">没有错字，很稳。</span>';
+    const slowChips = weak.slow.length
+      ? weak.slow.map((x) => `<span class="chip"><b>${esc(x.ch)}</b><em>${Math.round(x.avg)}ms</em></span>`).join('')
+      : '<span class="empty-note">样本还不够，多打一会儿会出现。</span>';
+    const drillBtn = weak.chars.length
+      ? '<button class="ghost-btn small" data-action="drill" type="button">专练这些字</button>'
+      : '';
+
+    return `
+      <div class="weak-section">
+        <div class="weak-title"><h3>弱项分析</h3>${drillBtn}</div>
+        <div class="weak-columns">
+          <div class="weak-panel">
+            <h4>错得最多</h4>
+            <div class="chip-row">${wrongChips}</div>
+          </div>
+          <div class="weak-panel">
+            <h4>最慢的字</h4>
+            <div class="chip-row">${slowChips}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function nextLabel(s) {
+    if (s.sub === 'essay' || s.sub === 'article') return '换一篇';
+    if (s.mode === 'code') return '下一个片段';
+    if (s.sub === 'custom') return '再练一组';
+    return '换一组';
+  }
+
+  function showResult(result) {
+    const s = app.session;
+    const badge = result.isFirst
+      ? '<span class="pb-badge">首次记录</span>'
+      : result.isPB
+        ? '<span class="pb-badge">★ 新纪录</span>'
+        : '';
+
+    let notes = '';
+    if (s.mode === 'zh') {
+      const bits = [];
+      if (result.punctuationErrors) bits.push(`标点错误 ${result.punctuationErrors} 处`);
+      if (result.lenientUsed) bits.push(`半角标点宽容 ${result.lenientUsed} 处`);
+      if (bits.length) notes = `<div class="note-line">${bits.join(' · ')}</div>`;
+    } else if (s.mode === 'en') {
+      if (result.punctuationErrors) {
+        notes = `<div class="note-line">标点错误 ${result.punctuationErrors} 处</div>`;
+      }
+    } else if (s.mode === 'code') {
+      const se = symbolErrors(s);
+      if (se) notes = `<div class="note-line">符号错误 ${se} 处，可以在下一组专门慢练符号。</div>`;
+    }
+
+    el.resultOverlay.innerHTML = `
+      <div class="modal result-modal" role="dialog" aria-modal="true" aria-label="练习结果">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">${esc(result.title)}</p>
+            <h2>练习完成</h2>
+          </div>
+          <button class="icon-btn" data-close="resultOverlay" type="button" aria-label="关闭">×</button>
+        </div>
+
+        <div class="result-hero">
+          <div class="result-speed"><span class="num">${result.speed}</span><span class="unit">${result.unit}</span></div>
+          ${badge}
+        </div>
+
+        <div class="result-grid">
+          <div class="metric"><label>正确率</label><b>${result.accuracy}%</b></div>
+          <div class="metric"><label>错误</label><b>${result.errors}</b></div>
+          <div class="metric"><label>用时</label><b>${result.duration.toFixed(1)}<small>s</small></b></div>
+          <div class="metric"><label>一致性</label><b>${result.consistency}%</b></div>
+        </div>
+        ${notes}
+
+        ${resultWeakHtml(s)}
+
+        <div class="result-actions">
+          <button class="ghost-btn" data-action="history" type="button">查看记录</button>
+          <button class="ghost-btn" data-action="next" type="button">${nextLabel(s)}</button>
+          <button class="primary-btn" data-action="again" type="button">再来一次</button>
+        </div>
+      </div>`;
+    el.resultOverlay.classList.remove('hidden');
+  }
+
+  function hideResult() {
+    el.resultOverlay.classList.add('hidden');
+    el.resultOverlay.innerHTML = '';
+  }
+
+  /* ---------------- session lifecycle ---------------- */
+  function configureInput(mode) {
+    const zh = mode === 'zh';
+    el.directSink.classList.toggle('hidden', zh);
+    el.imeSink.classList.toggle('hidden', !zh);
+    el.directSink.readOnly = true;
+    el.imeSink.readOnly = false;
+    el.directSink.value = '';
+    el.imeSink.value = '';
+    try { el.imeSink.setSelectionRange(0, 0); } catch (err) { /* noop */ }
+  }
+
+  function focusInput() {
+    const s = app.session;
+    if (!s) return;
+    const sink = s.mode === 'zh' ? el.imeSink : el.directSink;
+    try {
+      sink.focus({ preventScroll: true });
+    } catch (err) {
+      sink.focus();
+    }
+    if (s.mode === 'zh') {
+      try { el.imeSink.setSelectionRange(0, 0); } catch (err) { /* noop */ }
+    }
+  }
+
+  function startSession() {
+    stopTicker();
+    hideResult();
+
+    const cfg = currentConfig();
+    const target = buildTarget(cfg);
+    const s = newSession(cfg, target);
+    app.session = s;
+    app.composing = false;
+    app.compositionText = '';
+    app.punctuationHintShown = false;
+    app.imeHintShown = false;
+
+    el.imeWarning.hidden = true;
+    el.pauseOverlay.hidden = true;
+    el.stage.classList.remove('paused');
+    el.caret.classList.remove('visible');
+    el.preview.classList.remove('visible');
+    el.textViewport.scrollTop = 0;
+    el.textViewport.scrollLeft = 0;
+
+    applyModeClasses(cfg.mode);
+    renderTarget(target, cfg.mode);
+    configureInput(cfg.mode);
+    renderToolbar();
+
+    updateView();
+    updateHUD();
+    focusInput();
+  }
+
+  function restart() {
+    if (!app.session) return;
+    startSession();
+  }
+
+  function nextContent() {
+    const s = app.session;
+    if (!s) return;
+    if (s.sub === 'custom') {
+      if (app.lastDrillChars.length) {
+        app.customZh = { text: buildDrill(app.lastDrillChars) };
+      }
+      startSession();
+      return;
+    }
+    if (s.mode === 'zh' && s.sub === 'essay') {
+      app.prefs.zh.essay = (app.prefs.zh.essay + 1) % ZH_ESSAYS.length;
+    } else if (s.mode === 'en' && s.sub === 'article') {
+      app.prefs.en.article = (app.prefs.en.article + 1) % EN_ARTICLES.length;
+    } else if (s.mode === 'code') {
+      app.prefs.code.snippet = (app.prefs.code.snippet + 1) % PY_SNIPPETS.length;
+    }
+    savePrefs();
+    startSession();
+  }
+
+  function buildDrill(chars) {
+    const unique = Array.from(new Set(chars.filter(Boolean)));
+    if (!unique.length) return '';
+    const pool = [];
+    for (const ch of unique) {
+      for (let i = 0; i < 4; i++) pool.push(ch);
+    }
+    shuffle(pool);
+    const out = pool.slice();
+    while (out.length < 32) {
+      out.push(...shuffle(pool.slice()));
+    }
+    return out.join('');
+  }
+
+  function startDrill(chars) {
+    if (!chars || !chars.length) {
+      showToast('暂时没有明显的弱项字，多练几组再看看。');
+      return;
+    }
+    app.mode = 'zh';
+    app.prefs.mode = 'zh';
+    app.customZh = { text: buildDrill(chars) };
+    savePrefs();
+    updateTabs();
+    startSession();
+  }
+
+  /* ---------------- toolbar ---------------- */
+  function renderToolbar() {
+    const mode = app.mode;
+    const p = app.prefs;
+    let html = '';
+
+    if (mode === 'zh') {
+      if (app.customZh) {
+        html += `<div class="tool-group"><span class="tool-tag">专项练习</span><button class="ghost-btn small" data-action="back-words" type="button">返回字词</button></div>`;
+      } else {
+        html += `<div class="tool-group"><span class="tool-label">内容</span><div class="seg">
+          <button data-sub="words" class="${p.zh.sub === 'words' ? 'active' : ''}" type="button">字词</button>
+          <button data-sub="essay" class="${p.zh.sub === 'essay' ? 'active' : ''}" type="button">范文</button>
+        </div></div>`;
+        if (p.zh.sub === 'words') {
+          html += `<div class="tool-group"><span class="tool-label">时长</span><div class="seg">
+            ${[30, 60, 120].map((n) => `<button data-time="${n}" class="${p.zh.amount === n ? 'active' : ''}" type="button">${n}秒</button>`).join('')}
+          </div></div>`;
+        } else {
+          html += `<div class="tool-group"><span class="tool-label">篇目</span>
+            <select class="tool-select" id="essaySelect">
+              ${ZH_ESSAYS.map((e, i) => `<option value="${i}" ${i === p.zh.essay ? 'selected' : ''}>${esc(e.title)} · ${e.text.length} 字</option>`).join('')}
+            </select></div>`;
+        }
+      }
+    } else if (mode === 'en') {
+      html += `<div class="tool-group"><span class="tool-label">内容</span><div class="seg">
+        <button data-sub="words" class="${p.en.sub === 'words' ? 'active' : ''}" type="button">单词</button>
+        <button data-sub="article" class="${p.en.sub === 'article' ? 'active' : ''}" type="button">文章</button>
+      </div></div>`;
+      if (p.en.sub === 'words') {
+        html += `<div class="tool-group"><span class="tool-label">时长</span><div class="seg">
+          ${[15, 30, 60].map((n) => `<button data-wordmode="time" data-amount="${n}" class="${p.en.wordMode === 'time' && p.en.wordAmount === n ? 'active' : ''}" type="button">${n}秒</button>`).join('')}
+        </div></div>
+        <div class="tool-group"><span class="tool-label">词数</span><div class="seg">
+          ${[10, 25, 50].map((n) => `<button data-wordmode="count" data-amount="${n}" class="${p.en.wordMode === 'count' && p.en.wordAmount === n ? 'active' : ''}" type="button">${n}词</button>`).join('')}
+        </div></div>`;
+      } else {
+        html += `<div class="tool-group"><span class="tool-label">篇目</span>
+          <select class="tool-select" id="articleSelect">
+            ${EN_ARTICLES.map((a, i) => `<option value="${i}" ${i === p.en.article ? 'selected' : ''}>${esc(a.title)}</option>`).join('')}
+          </select></div>`;
+      }
+    } else {
+      html += `<div class="tool-group"><span class="tool-label">片段</span>
+        <select class="tool-select" id="snippetSelect">
+          ${PY_SNIPPETS.map((sn, i) => `<option value="${i}" ${i === p.code.snippet ? 'selected' : ''}>${i + 1}. ${esc(sn.title)} · ${esc(sn.level)}</option>`).join('')}
+        </select></div>`;
+    }
+
+    el.toolbar.innerHTML = html;
+  }
+
+  function onToolbarClick(e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    if (btn.dataset.action === 'back-words') {
+      app.customZh = null;
+      app.prefs.zh.sub = 'words';
+      savePrefs();
+      startSession();
+      return;
+    }
+
+    if (btn.dataset.sub) {
+      app.customZh = null;
+      if (app.mode === 'zh') app.prefs.zh.sub = btn.dataset.sub === 'essay' ? 'essay' : 'words';
+      else if (app.mode === 'en') app.prefs.en.sub = btn.dataset.sub === 'article' ? 'article' : 'words';
+      savePrefs();
+      startSession();
+      return;
+    }
+
+    if (btn.dataset.time) {
+      app.prefs.zh.amount = Number(btn.dataset.time);
+      savePrefs();
+      startSession();
+      return;
+    }
+
+    if (btn.dataset.wordmode) {
+      app.prefs.en.wordMode = btn.dataset.wordmode;
+      app.prefs.en.wordAmount = Number(btn.dataset.amount);
+      savePrefs();
+      startSession();
+    }
+  }
+
+  function onToolbarChange(e) {
+    const id = e.target.id;
+    const value = Number(e.target.value);
+    if (id === 'essaySelect') {
+      app.prefs.zh.essay = clampInt(value, 0, ZH_ESSAYS.length - 1, 0);
+      savePrefs();
+      startSession();
+    } else if (id === 'articleSelect') {
+      app.prefs.en.article = clampInt(value, 0, EN_ARTICLES.length - 1, 0);
+      savePrefs();
+      startSession();
+    } else if (id === 'snippetSelect') {
+      app.prefs.code.snippet = clampInt(value, 0, PY_SNIPPETS.length - 1, 0);
+      savePrefs();
+      startSession();
+    }
+  }
+
+  /* ---------------- mode ---------------- */
+  function updateTabs() {
+    $$('#modeTabs .tab').forEach((b) => {
+      b.classList.toggle('active', b.dataset.mode === app.mode);
+    });
+  }
+
+  function setMode(mode) {
+    if (mode === app.mode) return;
+    app.mode = mode;
+    app.prefs.mode = mode;
+    app.customZh = null;
+    savePrefs();
+    updateTabs();
+    startSession();
+  }
+
+  /* ---------------- settings ---------------- */
+  function saveSettings() {
+    writeJSON(SETTINGS_KEY, app.settings);
+  }
+
+  function syncSettingsUI() {
+    $$('#correctionSeg button').forEach((b) => {
+      b.classList.toggle('active', b.dataset.correction === app.settings.correction);
+    });
+    el.punctLenient.checked = app.settings.punctLenient;
+    el.autoIndent.checked = app.settings.autoIndent;
+  }
+
+  function updateFoot() {
+    el.modeHint.textContent = app.settings.correction === 'strict'
+      ? '严格模式 · 按对才能继续'
+      : '自由模式 · 错了也能继续';
+  }
+
+  function openSettings() {
+    syncSettingsUI();
+    openOverlay('settingsOverlay');
+  }
+
+  /* ---------------- overlays ---------------- */
+  function openOverlay(id) {
+    pauseSession();
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function closeOverlay(id) {
+    const node = document.getElementById(id);
+    if (node) node.classList.add('hidden');
+  }
+
+  function openOverlayEl() {
+    const list = $$('.overlay:not(.hidden)');
+    return list.length ? list[list.length - 1] : null;
+  }
+
+  /* ---------------- history ---------------- */
+  function subLabel(mode, sub) {
+    const map = {
+      zh: { words: '字词', essay: '范文', custom: '专项' },
+      en: { words: '单词', article: '文章' },
+      code: { snippet: '片段' }
+    };
+    return map[mode]?.[sub] || sub;
+  }
+
+  function fmtDate(ts) {
+    const d = new Date(ts);
+    const p = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  }
+
+  function chartSvg(records, unit) {
+    const W = 640;
+    const H = 190;
+    const L = 42;
+    const R = 16;
+    const T = 18;
+    const B = 30;
+    const max = Math.max(10, ...records.map((r) => r.speed));
+    const x = (i) => L + (records.length === 1 ? (W - L - R) / 2 : (i / (records.length - 1)) * (W - L - R));
+    const y = (v) => T + (1 - v / max) * (H - T - B);
+    const pts = records.map((r, i) => [x(i), y(r.speed)]);
+    const poly = pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+    const area = `M ${x(0).toFixed(1)} ${H - B} L ${pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' L ')} L ${x(records.length - 1).toFixed(1)} ${H - B} Z`;
+
+    const grid = [0, 0.25, 0.5, 0.75, 1].map((f) => {
+      const gy = T + f * (H - T - B);
+      const label = Math.round(max * (1 - f));
+      return `<line x1="${L}" y1="${gy.toFixed(1)}" x2="${W - R}" y2="${gy.toFixed(1)}" stroke="#252b38" stroke-width="1"/>`
+        + `<text x="${L - 8}" y="${(gy + 3.5).toFixed(1)}" text-anchor="end" fill="#4e576b" font-size="9">${label}</text>`;
+    }).join('');
+
+    const dots = pts.map((p, i) => {
+      const last = i === pts.length - 1;
+      return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${last ? 3.6 : 2.2}" fill="${last ? '#e8b923' : '#7aa2ff'}" opacity="${last ? 1 : 0.65}"/>`;
+    }).join('');
+
+    const d0 = new Date(records[0].ts);
+    const d1 = new Date(records[records.length - 1].ts);
+    const fmt = (d) => `${d.getMonth() + 1}/${d.getDate()}`;
+
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="成绩趋势">
+      <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#e8b923" stop-opacity="0.22"/>
+        <stop offset="1" stop-color="#e8b923" stop-opacity="0"/>
+      </linearGradient></defs>
+      ${grid}
+      <path d="${area}" fill="url(#areaGrad)"/>
+      <polyline points="${poly}" fill="none" stroke="#e8b923" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      <text x="${L}" y="${H - 8}" fill="#4e576b" font-size="9">${fmt(d0)}</text>
+      <text x="${W - R}" y="${H - 8}" text-anchor="end" fill="#4e576b" font-size="9">${fmt(d1)}</text>
+      <text x="${W - R}" y="12" text-anchor="end" fill="#818b9f" font-size="9">${unit}</text>
+    </svg>`;
+  }
+
+  function renderHistory() {
+    const mode = app.historyMode;
+    const records = app.history.filter((r) => r.mode === mode);
+    const unit = mode === 'zh' ? '字/分' : mode === 'en' ? 'WPM' : '字符/分';
+    const recent = records.slice(-40);
+
+    el.historyChart.innerHTML = recent.length
+      ? chartSvg(recent, unit)
+      : '<div class="chart-empty">还没有这个模式的记录，先练一组吧</div>';
+
+    const bestBySub = new Map();
+    for (const r of records) {
+      if (!bestBySub.has(r.sub) || r.speed > bestBySub.get(r.sub)) bestBySub.set(r.sub, r.speed);
+    }
+    el.historyBest.innerHTML = Array.from(bestBySub.entries())
+      .map(([sub, speed]) => `<span class="best-pill">${subLabel(mode, sub)} 最佳 <b>${Math.round(speed)}</b> ${unit}</span>`)
+      .join('');
+
+    const recentList = records.slice(-12).reverse();
+    el.historyList.innerHTML = recentList.length
+      ? recentList.map((r) => `
+          <div class="history-item">
+            <div class="hi-main">
+              <span class="hi-speed">${r.speed} ${r.unit}</span>
+              <span class="hi-sub">${esc(r.title)}</span>
+            </div>
+            <div class="hi-right">
+              <span>${r.accuracy}%</span>
+              <span>${fmtDate(r.ts)}</span>
+            </div>
+          </div>`).join('')
+      : '<div class="empty-note" style="padding:14px 0">还没有记录。</div>';
+  }
+
+  function syncHistoryTabs() {
+    $$('#historyTabs button').forEach((b) => {
+      b.classList.toggle('active', b.dataset.hmode === app.historyMode);
+    });
+  }
+
+  function openHistory() {
+    app.historyMode = app.mode;
+    syncHistoryTabs();
+    renderHistory();
+    openOverlay('historyOverlay');
+  }
+
+  /* ---------------- toast / warning ---------------- */
+  function showToast(message, ms = 2600) {
+    el.toast.textContent = message;
+    el.toast.classList.add('show');
+    clearTimeout(app.toastTimer);
+    app.toastTimer = setTimeout(() => el.toast.classList.remove('show'), ms);
+  }
+
+  function showImeWarning(message) {
+    el.imeWarning.textContent = message;
+    el.imeWarning.hidden = false;
+    clearTimeout(app.imeWarnTimer);
+    app.imeWarnTimer = setTimeout(() => {
+      el.imeWarning.hidden = true;
+    }, 4600);
+  }
+
+  /* ---------------- events ---------------- */
+  function bindEvents() {
+    $$('#modeTabs .tab').forEach((b) => {
+      b.addEventListener('click', () => setMode(b.dataset.mode));
+    });
+
+    el.toolbar.addEventListener('click', onToolbarClick);
+    el.toolbar.addEventListener('change', onToolbarChange);
+
+    el.restartBtn.addEventListener('click', restart);
+    el.finishBtn.addEventListener('click', () => {
+      const s = app.session;
+      if (!s || s.status === 'idle' || s.typed.length === 0) {
+        showToast('先开始输入吧。');
+        return;
+      }
+      finishSession('manual');
+    });
+
+    $('#settingsBtn').addEventListener('click', openSettings);
+    $('#historyBtn').addEventListener('click', openHistory);
+
+    el.correctionSeg.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-correction]');
+      if (!btn) return;
+      app.settings.correction = btn.dataset.correction === 'strict' ? 'strict' : 'free';
+      if (app.session) app.session.strict = app.settings.correction === 'strict';
+      saveSettings();
+      syncSettingsUI();
+      updateFoot();
+      showToast(app.settings.correction === 'strict' ? '已切换到严格模式' : '已切换到自由模式');
+    });
+
+    el.punctLenient.addEventListener('change', () => {
+      app.settings.punctLenient = el.punctLenient.checked;
+      saveSettings();
+      if (app.session) updateView();
+      showToast(app.settings.punctLenient ? '标点宽容已开启' : '标点宽容已关闭');
+    });
+
+    el.autoIndent.addEventListener('change', () => {
+      app.settings.autoIndent = el.autoIndent.checked;
+      saveSettings();
+      showToast(app.settings.autoIndent ? '自动缩进已开启' : '自动缩进已关闭');
+    });
+
+    el.historyTabs.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-hmode]');
+      if (!btn) return;
+      app.historyMode = btn.dataset.hmode;
+      syncHistoryTabs();
+      renderHistory();
+    });
+
+    el.clearHistoryBtn.addEventListener('click', () => {
+      if (!app.history.length) {
+        showToast('还没有记录。');
+        return;
+      }
+      if (!window.confirm('确定清空全部练习记录吗？此操作无法撤销。')) return;
+      app.history = [];
+      writeJSON(HISTORY_KEY, []);
+      renderHistory();
+      showToast('记录已清空。');
+    });
+
+    el.resultOverlay.addEventListener('click', (e) => {
+      if (e.target === el.resultOverlay) {
+        hideResult();
+        return;
+      }
+      const btn = e.target.closest('[data-action]');
+      if (btn) {
+        const action = btn.dataset.action;
+        if (action === 'again') {
+          hideResult();
+          restart();
+        } else if (action === 'next') {
+          hideResult();
+          nextContent();
+        } else if (action === 'history') {
+          hideResult();
+          openHistory();
+        } else if (action === 'drill') {
+          hideResult();
+          startDrill(app.lastDrillChars);
+        }
+        return;
+      }
+      if (e.target.closest('[data-close="resultOverlay"]')) hideResult();
+    });
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-close]');
+      if (!btn) return;
+      const id = btn.dataset.close;
+      if (id === 'resultOverlay') hideResult();
+      else closeOverlay(id);
+    });
+
+    ['settingsOverlay', 'historyOverlay'].forEach((id) => {
+      const node = document.getElementById(id);
+      node.addEventListener('mousedown', (e) => {
+        if (e.target === node) closeOverlay(id);
+      });
+    });
+
+    el.directSink.addEventListener('keydown', onDirectKey);
+    el.directSink.addEventListener('beforeinput', (e) => e.preventDefault());
+    el.directSink.addEventListener('paste', (e) => e.preventDefault());
+    el.directSink.addEventListener('compositionstart', () => {
+      showImeWarning('检测到输入法合成，请切换到英文输入状态');
+    });
+    el.directSink.addEventListener('focus', onSinkFocus);
+    el.directSink.addEventListener('blur', onSinkBlur);
+
+    el.imeSink.addEventListener('keydown', onZhKey);
+    el.imeSink.addEventListener('input', onZhInput);
+    el.imeSink.addEventListener('compositionstart', onCompStart);
+    el.imeSink.addEventListener('compositionupdate', onCompUpdate);
+    el.imeSink.addEventListener('compositionend', onCompEnd);
+    el.imeSink.addEventListener('beforeinput', (e) => {
+      if (e.inputType === 'insertFromPaste') e.preventDefault();
+    });
+    el.imeSink.addEventListener('paste', (e) => e.preventDefault());
+    el.imeSink.addEventListener('focus', onSinkFocus);
+    el.imeSink.addEventListener('blur', onSinkBlur);
+
+    el.stage.addEventListener('click', (e) => {
+      if (e.target.closest('button, select, option')) return;
+      focusInput();
+    });
+
+    el.pauseOverlay.addEventListener('click', focusInput);
+
+    window.addEventListener('blur', pauseSession);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pauseSession();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (e.isComposing || app.composing) return;
+        const overlay = openOverlayEl();
+        if (overlay) {
+          e.preventDefault();
+          if (overlay.id === 'resultOverlay') hideResult();
+          else closeOverlay(overlay.id);
+          return;
+        }
+        const ae = document.activeElement;
+        if (ae && (ae.tagName === 'SELECT' || ae.tagName === 'INPUT' || ae.tagName === 'BUTTON')) return;
+        if (app.session) {
+          e.preventDefault();
+          restart();
+        }
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        if (e.isComposing || app.composing) return;
+        if (openOverlayEl()) return;
+        const ae = document.activeElement;
+        if (ae === el.directSink || ae === el.imeSink) {
+          e.preventDefault();
+          restart();
+        }
+      }
+    });
+  }
+
+  function onSinkFocus() {
+    const s = app.session;
+    if (!s) return;
+    if (s.status === 'paused') resumeSession();
+    if (s.mode === 'zh') {
+      try { el.imeSink.setSelectionRange(0, 0); } catch (err) { /* noop */ }
+    }
+  }
+
+  function onSinkBlur() {
+    const s = app.session;
+    if (!s || s.status !== 'running') return;
+    pauseSession();
+  }
+
+  function savePrefs() {
+    app.prefs.mode = app.mode;
+    writeJSON(PREFS_KEY, app.prefs);
+  }
+
+  /* ---------------- init ---------------- */
+  function init() {
+    updateTabs();
+    syncSettingsUI();
+    updateFoot();
+    bindEvents();
+    startSession();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# Node / test artifacts
+node_modules/
+shots/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
