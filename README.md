@@ -1,3 +1,4 @@
+ [在线访问打字练习](https://idb767.github.io/typing-practice/)
 # Typing Practice (Offline Single-File Edition)
 
 A typing-speed practice page for Chinese, English, and Python code. The whole app is one `index.html` — double-click it in Edge or Chrome. No internet, no installation.
